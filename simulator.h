@@ -151,8 +151,12 @@ class Simulator {
     */
 
     // 加法性雑音の標準偏差を設定
-    void setEbN0dB(double EbN0dB) {
+    void set_QPSKNoiseSD(double EbN0dB) {
         noiseSD_ = sqrt(0.5 * pow(10.0, -0.1 * EbN0dB));        // Eb/N0 [dB] から変換
+    }
+
+    void set_16QAMNoiseSD(double EbN0dB) {
+        noiseSD_ = sqrt(0.25 * pow(10.0, -0.1 * EbN0dB));        // Eb/N0 [dB] から変換
     }
 
     // 結果

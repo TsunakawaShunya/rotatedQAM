@@ -38,7 +38,6 @@ int main() {
     std::cout << "--------------------------------------------------------------------" << std::endl;
     std::cin >> EbN0dB;
 
-    sim.setEbN0dB(EbN0dB);      // SN比セット
     sim.setSymbol();        // 従来QAMシンボル設計
 
     // 配列の初期化
@@ -65,6 +64,8 @@ int main() {
                 filenameNearlyUpperBound[i] = "RotatedQPSK_nearly_upperbound_" + std::to_string((int)EbN0dB) + "dB_" + std::to_string(i + 1) + ".csv";
                 ofsNearlyUpperBound[i].open(filenameNearlyUpperBound[i]);
             }
+
+            sim.set_QPSKNoiseSD(EbN0dB);
 
             for(double theta = theta_min; theta <= theta_max; theta += theta_stp) {
                 sim.setRotationSymbol(theta);       // 回転
@@ -133,6 +134,8 @@ int main() {
             ofsUpperBoundSum.open(filenameUpperBoundSum);
             filenameNearlyUpperBoundSum = "Rotated16QAM_nearly_upperbound_" + std::to_string((int)EbN0dB) + "dB.csv";
             ofsNearlyUpperBoundSum.open(filenameNearlyUpperBoundSum);
+
+            sim.set_16QAMNoiseSD(EbN0dB);
 
             for (int i = 0; i < sim.NUMBER_OF_BIT; i++) {
                 filenameUpperBound[i] = "Rotated16QAM_upperbound_" + std::to_string((int)EbN0dB) + "dB_" + std::to_string(i + 1) + ".csv";

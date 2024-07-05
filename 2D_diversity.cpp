@@ -3,8 +3,8 @@
 
 // SNR
 static const double EbN0dBmin = 0.0;        // Eb/N0 の最小値 [dB]
-static const double EbN0dBmax = 35.0;        // Eb/N0 の最大値 [dB]
-static const double EbN0dBstp = 1.0;        // Eb/N0 の間隔 [dB]
+static const double EbN0dBmax = 40.0;        // Eb/N0 の最大値 [dB]
+static const double EbN0dBstp = 0.5;        // Eb/N0 の間隔 [dB]
 double EbN0dB;
 
 // ファイル
@@ -29,8 +29,6 @@ int main() {
             ofsTheory_2.open(filenameTheory_2);
 
             for(double EbN0dB = EbN0dBmin; EbN0dB <= EbN0dBmax; EbN0dB += EbN0dBstp) {
-                sim.setEbN0dB(EbN0dB);
-
                 // 標準出力
                 berTheory_1 = sim.get_QPSKTheory(EbN0dB);
                 std::cout << "Theory(1-Diversity) : " << EbN0dB << "," << berTheory_1 << std::endl;
@@ -51,8 +49,6 @@ int main() {
             ofsTheory_2.open(filenameTheory_2);
 
             for(double EbN0dB = EbN0dBmin; EbN0dB <= EbN0dBmax; EbN0dB += EbN0dBstp) {
-                sim.setEbN0dB(EbN0dB);
-
                 // 標準出力
                 berTheory_1 = sim.get16QAMTheory(EbN0dB);
                 std::cout << "Theory(1-Diversity) : " << EbN0dB << "," << berTheory_1 << std::endl;

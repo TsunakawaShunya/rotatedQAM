@@ -4,8 +4,8 @@
 
 // SNR
 static const double EbN0dBmin = 0.0;        // Eb/N0 の最小値 [dB]
-static const double EbN0dBmax = 35.0;        // Eb/N0 の最大値 [dB]
-static const double EbN0dBstp = 1.0;        // Eb/N0 の間隔 [dB]
+static const double EbN0dBmax = 40.0;        // Eb/N0 の最大値 [dB]
+static const double EbN0dBstp = 5.0;        // Eb/N0 の間隔 [dB]
 double EbN0dB;
 
 // 回転角
@@ -71,7 +71,7 @@ int main() {
             }
 
             for(double EbN0dB = EbN0dBmin; EbN0dB <= EbN0dBmax; EbN0dB += EbN0dBstp) {
-                sim.setEbN0dB(EbN0dB);      // SN比セット
+                sim.set_QPSKNoiseSD(EbN0dB);
 
                 //ber = sim.getBerSimulation();
                 berUpperBoundVec = sim.getBerUpperBoundVec(theta);
@@ -105,9 +105,10 @@ int main() {
         break;
         case 4:
             // ファイル作成
-            //filename = "Rotated16QAM_sim_" + std::to_string(theta_deg) + "deg.csv";
-            //ofs.open(filename);
-
+            filename = "Rotated16QAM_sim_" + std::to_string(theta_deg) + "deg.csv";
+            ofs.open(filename);
+            
+            /*
             filenameUpperBoundSum = "Rotated16QAM_upperbound_" + std::to_string(theta_deg) + "deg.csv";
             ofsUpperBoundSum.open(filenameUpperBoundSum);
             filenameNearlyUpperBoundSum = "Rotated16QAM_nearly_upperbound_" + std::to_string(theta_deg) + "deg.csv";
@@ -119,19 +120,22 @@ int main() {
                 filenameNearlyUpperBound[i] = "Rotated16QAM_nearly_upperbound_" + std::to_string(theta_deg) + "deg_" + std::to_string(i + 1) + ".csv";
                 ofsNearlyUpperBound[i].open(filenameNearlyUpperBound[i]);
             }
+            */
+            
 
 
             for(double EbN0dB = EbN0dBmin; EbN0dB <= EbN0dBmax; EbN0dB += EbN0dBstp) {
-                sim.setEbN0dB(EbN0dB);      // SN比セット
+                sim.set_16QAMNoiseSD(EbN0dB);
 
-                //ber = sim.getBerSimulation();
-                berUpperBoundVec = sim.getBerUpperBoundVec(theta);
-                berNearlyUpperBoundVec = sim.get_nearlyBerUpperBoundVec(theta);
+                ber = sim.getBerSimulation();
+                //berUpperBoundVec = sim.getBerUpperBoundVec(theta);
+                //berNearlyUpperBoundVec = sim.get_nearlyBerUpperBoundVec(theta);
 
                 // 標準出力
                 std::cout << "--------------------------------------------" << std::endl;
                 std::cout << "simulation : " << EbN0dB << "," << ber << std::endl;
 
+                /*
                 for(int i = 0; i < sim.NUMBER_OF_BIT; i++) {
                     std::cout << "upperbound(" << i << ") : " << EbN0dB << "," << berUpperBoundVec(i) << std::endl;
                 }
@@ -140,10 +144,12 @@ int main() {
                     std::cout << "nearly_upperbound(" << i << ") : " << EbN0dB << "," << berNearlyUpperBoundVec(i) << std::endl;
                 }
                 std::cout << "nearly_upperbound : " << EbN0dB << "," << berNearlyUpperBoundVec.sum() << std::endl;
-
+                */
+               
                 // ファイル出力
-                //ofs << EbN0dB << "," << ber << std::endl;
+                ofs << EbN0dB << "," << ber << std::endl;
 
+                /*
                 for (int i = 0; i < sim.NUMBER_OF_BIT; i++) {
                     ofsUpperBound[i] << EbN0dB << "," << berUpperBoundVec(i) << std::endl;
                 }
@@ -153,15 +159,15 @@ int main() {
                     ofsNearlyUpperBound[i] << EbN0dB << "," << berNearlyUpperBoundVec(i) << std::endl;
                 }
                 ofsNearlyUpperBoundSum << EbN0dB << "," << berNearlyUpperBoundVec.sum() << std::endl;
-
+                */
             }
         break;
     }
 
     // 終了
-    //ofs.close();
+    ofs.close();
 
-
+    /*
     ofsUpperBoundSum.close();
     for (int i = 0; i < sim.NUMBER_OF_BIT; ++i) {
         ofsUpperBound[i].close();
@@ -170,7 +176,7 @@ int main() {
     for (int i = 0; i < sim.NUMBER_OF_BIT; ++i) {
         ofsNearlyUpperBound[i].close();
     }
-
+    */
 
     return 0;
 }

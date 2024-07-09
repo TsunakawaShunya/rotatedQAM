@@ -6,10 +6,10 @@
 double EbN0dB;
 
 // 回転角
-static const double theta_min = 0.5 * M_PI / 180;        // 回転角の最小値 [rad]
+static const double theta_min = 0.0;                     // 回転角の最小値 [rad]
 static const double theta_max = 45 * M_PI / 180 ;        // 回転角の最大値 [rad]
-static const double theta_stp = 0.5 * M_PI / 180;        // 回転角の間隔 [rad]
-double theta_deg = 0.5;       // csvファイルの第1カラム(角度 [°])
+static const double theta_stp = 5.0 * M_PI / 180;        // 回転角の間隔 [rad]
+double theta_deg = 0.0;                                  // csvファイルの第1カラム(角度 [°])
 
 // ファイル
 std::string filename;
@@ -128,14 +128,14 @@ int main() {
         break;
         case 4:
             // ファイル作成
-            //filename = "RotatedQPSK_sim_" + std::to_string((int)EbN0dB) + "dB.csv";
-            //ofs.open(filename);
+            filename = "RotatedQPSK_sim_" + std::to_string((int)EbN0dB) + "dB.csv";
+            ofs.open(filename);
+
+            /*
             filenameUpperBoundSum = "Rotated16QAM_upperbound_" + std::to_string((int)EbN0dB) + "dB.csv";
             ofsUpperBoundSum.open(filenameUpperBoundSum);
             filenameNearlyUpperBoundSum = "Rotated16QAM_nearly_upperbound_" + std::to_string((int)EbN0dB) + "dB.csv";
             ofsNearlyUpperBoundSum.open(filenameNearlyUpperBoundSum);
-
-            sim.set_16QAMNoiseSD(EbN0dB);
 
             for (int i = 0; i < sim.NUMBER_OF_BIT; i++) {
                 filenameUpperBound[i] = "Rotated16QAM_upperbound_" + std::to_string((int)EbN0dB) + "dB_" + std::to_string(i + 1) + ".csv";
@@ -143,17 +143,25 @@ int main() {
                 filenameNearlyUpperBound[i] = "Rotated16QAM_nearly_upperbound_" + std::to_string((int)EbN0dB) + "dB_" + std::to_string(i + 1) + ".csv";
                 ofsNearlyUpperBound[i].open(filenameNearlyUpperBound[i]);
             }
+            */
+
+            sim.set_16QAMNoiseSD(EbN0dB);
 
             for(double theta = theta_min; theta <= theta_max; theta += theta_stp) { 
                 sim.setRotationSymbol(theta);       // 回転 
 
-                //ber = sim.getBerSimulation();
+                ber = sim.getBerSimulation();
+
+                /*
                 berUpperBoundVec = sim.getBerUpperBoundVec(theta);
                 berNearlyUpperBoundVec = sim.get_nearlyBerUpperBoundVec(theta);
+                */
 
                 // 標準出力
                 std::cout << "--------------------------------------------" << std::endl;
-                //std::cout << "simulation : " << theta_deg << "," << ber << std::endl;
+                std::cout << "simulation : " << theta_deg << "," << ber << std::endl;
+
+                /*
                 for(int i = 0; i < sim.NUMBER_OF_BIT; i++) {
                     std::cout << "upperbound(" << i << ") : " << theta_deg << "," << berUpperBoundVec(i) << std::endl;
                 }
@@ -163,9 +171,12 @@ int main() {
                     std::cout << "nearly_upperbound(" << i << ") : " << theta_deg << "," << berNearlyUpperBoundVec(i) << std::endl;
                 }
                 std::cout << "nearly_upperbound : " << theta_deg << "," << berNearlyUpperBoundVec.sum() << std::endl;
+                */
 
                 // ファイル出力
-                //ofs << theta_deg << "," << ber << std::endl;
+                ofs << theta_deg << "," << ber << std::endl;
+
+                /*
                 for (int i = 0; i < sim.NUMBER_OF_BIT; i++) {
                     ofsUpperBound[i] << theta_deg << "," << berUpperBoundVec(i) << std::endl;
                 }
@@ -175,8 +186,9 @@ int main() {
                     ofsNearlyUpperBound[i] << theta_deg << "," << berNearlyUpperBoundVec(i) << std::endl;
                 }
                 ofsNearlyUpperBoundSum << theta_deg << "," << berNearlyUpperBoundVec.sum() << std::endl;
+                */
 
-                theta_deg += 0.5;     // csvファイルの第1カラムをインクリメント
+                theta_deg += 5.0;     // csvファイルの第1カラムをインクリメント
             }
         break;
     }
@@ -217,7 +229,6 @@ int main() {
         ofsNearlyUpperBound[i] << optimal_deg << "," << berNearlyUpperBoundVec(i) << std::endl;
     }
     ofsNearlyUpperBoundSum << optimal_deg << "," << berNearlyUpperBoundVec.sum() << std::endl;
-    */
 
     // 終了
     ofsUpperBoundSum.close();
@@ -231,6 +242,6 @@ int main() {
 
     // 最適な回転角を標準出力
     std::cout << "Optimal theta (deg): " << optimal_deg << std::endl;
-
+    */
     return 0;
 }

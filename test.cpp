@@ -1,71 +1,94 @@
-// 2次のダイバーシチ
+// 回転角に対するBER
 #include "simulator.h"
+#include <vector>
 
 // SNR
-static const double EbN0dBmin = 0.0;        // Eb/N0 の最小値 [dB]
-static const double EbN0dBmax = 35.0;        // Eb/N0 の最大値 [dB]
-static const double EbN0dBstp = 1.0;        // Eb/N0 の間隔 [dB]
 double EbN0dB;
 
-// ファイル
-std::string filenameTheory_1;
-std::string filenameTheory_2;
-std::ofstream ofsTheory_1;
-std::ofstream ofsTheory_2;
+// 回転角
+static const double theta_min = 0.0;                     // 回転角の最小値 [rad]
+static const double theta_max = 45 * M_PI / 180 ;        // 回転角の最大値 [rad]
+static const double theta_stp = 5.0 * M_PI / 180;        // 回転角の間隔 [rad]
+double theta_deg = 0.0;                                  // csvファイルの第1カラム(角度 [°])
 
-double berTheory_1;     // 1次ダイバーシチ
-double berTheory_2;        // 2次ダイバーシチ
+// ファイル
+std::string filename;
+std::string filenameUpperBoundSum;      // 厳密な BER 上界の合計
+std::vector<std::string> filenameUpperBound;        // 誤りビットごとの厳密な BER 上界の合計
+std::string filenameNearlyUpperBoundSum;        // BER 上界近似の合計
+std::vector<std::string> filenameNearlyUpperBound;      // 誤りビット数ごとの BER 上界近似
+
+std::ofstream ofs;
+std::ofstream ofsUpperBoundSum;     // 厳密な BER 上界の合計
+std::vector<std::ofstream> ofsUpperBound;      // 誤りビット数ごとの 厳密な BER 上界
+std::ofstream ofsNearlyUpperBoundSum;        // BER 上界近似の合計
+std::vector<std::ofstream> ofsNearlyUpperBound;      // 誤りビット数ごとのBER 上界近似
+
+// BER
+double ber;     // BERシミュレーション値
+Eigen::VectorXd berUpperBoundVec;       // BER上界
+Eigen::VectorXd berNearlyUpperBoundVec;     // BER上界の近似値
 
 int main() {
     Simulator sim;
 
-    sim.setSymbol();        // 従来QAMでのシンボル設計
+    // SNR設定
+    std::cout << "--------------------------------------------------------------------" << std::endl;
+    std::cout << "EbN0dB [dB]?" << std::endl;
+    std::cout << "--------------------------------------------------------------------" << std::endl;
+    std::cin >> EbN0dB;
+
+    sim.setSymbol();        // 従来QAMシンボル設計
+
+    // 配列の初期化
+    filenameUpperBound.resize(sim.NUMBER_OF_BIT);
+    ofsUpperBound.resize(sim.NUMBER_OF_BIT);
+    berUpperBoundVec.resize(sim.NUMBER_OF_BIT);
+    filenameNearlyUpperBound.resize(sim.NUMBER_OF_BIT);
+    ofsNearlyUpperBound.resize(sim.NUMBER_OF_BIT);
+    berNearlyUpperBoundVec.resize(sim.NUMBER_OF_BIT);
 
     switch(sim.NUMBER_OF_BIT) {
         case 2:
-            filenameTheory_1 = "QPSK_theory_1Diversity.csv";
-            filenameTheory_2 = "4QAM_theory_1Diversity.csv";
-            ofsTheory_1.open(filenameTheory_1);
-            ofsTheory_2.open(filenameTheory_2);
+            /*        
+            // 最適な回転角の結果を追加
+            // 27.3678
+            theta_deg = 27.3678;
+            //std::cout << theta_opt * 180 / M_PI << std::endl;
+            sim.setRotationSymbol(theta_opt);
+            ber = sim.getBerSimulation();
+            std::cout << theta_deg << "," << ber << std::endl;
+            ofs << theta_deg << "," << ber << std::endl;
 
-            for(double EbN0dB = EbN0dBmin; EbN0dB <= EbN0dBmax; EbN0dB += EbN0dBstp) {
-                sim.setEbN0dB(EbN0dB);
+            theta_deg = 29.6;
+            sim.setRotationSymbol(theta_deg * M_PI / 180);
+            ber = sim.getBerSimulation();
+            std::cout << theta_deg << "," << ber << std::endl;
+            ofs << theta_deg << "," << ber << std::endl;
 
-                // 標準出力
-                berTheory_1 = sim.get_QPSKTheory_1diversity(EbN0dB);
-                std::cout << "Theory(QPSK) : " << EbN0dB << "," << berTheory_1 << std::endl;
-                berTheory_2 = sim.get_QAMTheory_1diversity(EbN0dB);
-                std::cout << "Theory(4QAM) : " << EbN0dB << "," << berTheory_2 << std::endl;
-
-                // ファイル出力
-                ofsTheory_1 << EbN0dB << "," << berTheory_1 << std::endl;
-                ofsTheory_2 << EbN0dB << "," << berTheory_2 << std::endl;
-            }
-            ofsTheory_1.close();
-            ofsTheory_2.close();
+            theta_deg = 31.7;
+            sim.setRotationSymbol(theta_deg * M_PI / 180);
+            ber = sim.getBerSimulation();
+            std::cout << theta_deg << "," << ber << std::endl;
+            ofs << theta_deg << "," << ber << std::endl;
+            ofs.close();
+            */
         break;
         case 4:
-            filenameTheory_1 = "16QAM_theory_1Diversity.csv";
-            filenameTheory_2 = "16QAM_theory_2Diversity.csv";
-            ofsTheory_1.open(filenameTheory_1);
-            ofsTheory_2.open(filenameTheory_2);
+            sim.set_16QAMNoiseSD(EbN0dB);
 
-            for(double EbN0dB = EbN0dBmin; EbN0dB <= EbN0dBmax; EbN0dB += EbN0dBstp) {
-                sim.setEbN0dB(EbN0dB);
+            double optimal_deg;
+            optimal_deg = 21.0148;
 
-                // 標準出力
-                berTheory_1 = sim.get_QAMTheory_1diversity(EbN0dB);
-                std::cout << "Theory(1-Diversity) : " << EbN0dB << "," << berTheory_1 << std::endl;
-                berTheory_2 = sim.get_QAMTheory_Ldiversity(EbN0dB);     // デフォルトはL=2
-                std::cout << "Theory(2-Diversity) : " << EbN0dB << "," << berTheory_2 << std::endl;
+            sim.setRotationSymbol(optimal_deg * M_PI / 180);       // 回転 
 
-                // ファイル出力
-                ofsTheory_1 << EbN0dB << "," << berTheory_1 << std::endl;
-                ofsTheory_2 << EbN0dB << "," << berTheory_2 << std::endl;
-            }
-            ofsTheory_1.close();
-            ofsTheory_2.close();
+            ber = sim.getBerSimulation();
+
+            // 標準出力
+            std::cout << "--------------------------------------------" << std::endl;
+            std::cout << "simulation : " << optimal_deg << "," << ber << std::endl;
         break;
     }
+
     return 0;
 }

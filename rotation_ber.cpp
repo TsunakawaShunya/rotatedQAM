@@ -128,7 +128,7 @@ int main() {
         break;
         case 4:
             // ファイル作成
-            filename = "RotatedQPSK_sim_" + std::to_string((int)EbN0dB) + "dB.csv";
+            filename = "Rotated16QAM_sim_" + std::to_string((int)EbN0dB) + "dB.csv";
             ofs.open(filename);
 
             /*

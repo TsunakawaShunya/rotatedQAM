@@ -211,12 +211,12 @@ class Simulator {
     }
 
     // 誤りビット数ごとの平均BERの上界
-    Eigen::VectorXd getBerUpperBoundVec(double theta) {
+    Eigen::VectorXd getBerUpperBoundVec(double theta_rad) {
         Eigen::VectorXd ber;
         double per;
         int hamming;        // ハミング距離
 
-        set_alphaOmegaKappaGammaZeta(theta);
+        set_alphaOmegaKappaGammaZeta(theta_rad);
         ber.resize(NUMBER_OF_BIT);
         ber.setZero();
         
@@ -279,6 +279,33 @@ class Simulator {
         return x;
     }
 
+    // 解を求める（気合）
+    // resolution：分解能
+    double get_optimizeTheta_deg(std::function<double(double)> func, double start_deg, double end_deg, double resolution_deg) {
+        //std::cout << "initial params" << std::endl;
+        //std::cout << start_deg << ", " << end_deg << ", " << resolution_deg << std::endl;
+
+        // rad に変換
+        double start_rad = start_deg * M_PI / 180.0;
+        double end_rad = end_deg * M_PI / 180.0;
+        double resolution_rad = resolution_deg * M_PI / 180.0;
+
+        // x, y の定義
+        double y;               // y = func(x)
+        double x_rad_min;           // 最小解
+        double y_min = 100.0;     // BER（初期値は適当な値）
+
+        for(double x = start_rad; x <= end_rad; x += resolution_rad) {
+            y = func(x);
+            if(y_min > y) {
+                x_rad_min = x;
+                y_min = y;
+            }
+            // std::cout << x * 180.0 / M_PI << ", " << y << std::endl;
+        }
+        return x_rad_min * 180.0 / M_PI;
+    }
+
     // QPSK_1次ダイバーシチ[ディジタルコミュニケーションp.898:式(14-3-7)]
     double get_QPSKTheory(double EbN0dB) {
         double gamma_b = pow(10.0, 0.1 * EbN0dB);
@@ -298,6 +325,7 @@ class Simulator {
     // 16QAM理論値
     double get16QAMTheory(double EbN0dB) {
         double EbN0 = pow(10.0, 0.1 * EbN0dB);
+
         return 3.0 / 8.0 * (1.0 - 1.0 / sqrt(1.0 + 5.0 / 2.0 / EbN0))
                 + 1.0 / 4.0 * (1.0 - 1.0 / sqrt(1.0 + 5.0 * 2.0 / EbN0 / 9.0))
                 - 1.0 / 8.0 * (1.0 - 1.0 / sqrt(1.0 + 5.0 * 2.0 / EbN0 / 25.0));
@@ -306,7 +334,7 @@ class Simulator {
     // 16QAM_L次のダイバーシチ[ディジタルコミュニケーションp.917:式(14-4-47)]
     // デフォルトでは2次ダイバーシチ
     double get_QAMTheory_Ldiversity(double EbN0dB, int L = 2) {
-        double EbN0 = 0.5 * pow(10.0, 0.1 * EbN0dB);
+        double EbN0 = 0.25 * pow(10.0, 0.1 * EbN0dB);
         double mu = sqrt(EbN0 / (1.0 + EbN0));
         double ber = pow((1.0 - mu) / 2.0, 2) * (2.0 + mu);
         return ber;
@@ -525,6 +553,11 @@ class Simulator {
     // 二階微分
     double numerical_second_derivative(std::function<double(double)> func, double x, double h = 1e-6) {
         return (func(x + h) - 2 * func(x) + func(x - h)) / (h * h);
+    }
+
+    // Q関数
+    double Q(double x) {
+        return 1.0 / 2.0 * std::erfc(x / sqrt(2.0));
     }
 };
 #endif /* SIMULATOR_H */

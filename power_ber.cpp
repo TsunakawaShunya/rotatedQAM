@@ -105,10 +105,10 @@ int main() {
         break;
         case 4:
             // ファイル作成
+            /*
             filename = "Rotated16QAM_sim_" + std::to_string(theta_deg) + "deg.csv";
             ofs.open(filename);
-            
-            /*
+            */
             filenameUpperBoundSum = "Rotated16QAM_upperbound_" + std::to_string(theta_deg) + "deg.csv";
             ofsUpperBoundSum.open(filenameUpperBoundSum);
             filenameNearlyUpperBoundSum = "Rotated16QAM_nearly_upperbound_" + std::to_string(theta_deg) + "deg.csv";
@@ -120,22 +120,21 @@ int main() {
                 filenameNearlyUpperBound[i] = "Rotated16QAM_nearly_upperbound_" + std::to_string(theta_deg) + "deg_" + std::to_string(i + 1) + ".csv";
                 ofsNearlyUpperBound[i].open(filenameNearlyUpperBound[i]);
             }
-            */
             
 
 
             for(double EbN0dB = EbN0dBmin; EbN0dB <= EbN0dBmax; EbN0dB += EbN0dBstp) {
                 sim.set_16QAMNoiseSD(EbN0dB);
 
-                ber = sim.getBerSimulation();
-                //berUpperBoundVec = sim.getBerUpperBoundVec(theta);
-                //berNearlyUpperBoundVec = sim.get_nearlyBerUpperBoundVec(theta);
+                //ber = sim.getBerSimulation();
+                berUpperBoundVec = sim.getBerUpperBoundVec(theta);
+                berNearlyUpperBoundVec = sim.get_nearlyBerUpperBoundVec(theta);
 
                 // 標準出力
+                /*
                 std::cout << "--------------------------------------------" << std::endl;
                 std::cout << "simulation : " << EbN0dB << "," << ber << std::endl;
-
-                /*
+                */
                 for(int i = 0; i < sim.NUMBER_OF_BIT; i++) {
                     std::cout << "upperbound(" << i << ") : " << EbN0dB << "," << berUpperBoundVec(i) << std::endl;
                 }
@@ -144,12 +143,10 @@ int main() {
                     std::cout << "nearly_upperbound(" << i << ") : " << EbN0dB << "," << berNearlyUpperBoundVec(i) << std::endl;
                 }
                 std::cout << "nearly_upperbound : " << EbN0dB << "," << berNearlyUpperBoundVec.sum() << std::endl;
-                */
                
                 // ファイル出力
-                ofs << EbN0dB << "," << ber << std::endl;
+                //ofs << EbN0dB << "," << ber << std::endl;
 
-                /*
                 for (int i = 0; i < sim.NUMBER_OF_BIT; i++) {
                     ofsUpperBound[i] << EbN0dB << "," << berUpperBoundVec(i) << std::endl;
                 }
@@ -159,7 +156,6 @@ int main() {
                     ofsNearlyUpperBound[i] << EbN0dB << "," << berNearlyUpperBoundVec(i) << std::endl;
                 }
                 ofsNearlyUpperBoundSum << EbN0dB << "," << berNearlyUpperBoundVec.sum() << std::endl;
-                */
             }
         break;
     }

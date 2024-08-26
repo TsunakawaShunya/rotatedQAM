@@ -87,6 +87,21 @@ int main() {
             // 標準出力
             std::cout << "--------------------------------------------" << std::endl;
             std::cout << "simulation : " << optimal_deg << "," << ber << std::endl;
+
+            optimal_deg = 31.7;
+            sim.setRotationSymbol(optimal_deg * M_PI / 180);       // 回転 
+            ber = sim.getBerSimulation();
+
+            // 標準出力
+            std::cout << "simulation : " << optimal_deg << "," << ber << std::endl;
+
+            optimal_deg = 35.8;
+            sim.setRotationSymbol(optimal_deg * M_PI / 180);       // 回転 
+            ber = sim.getBerSimulation();
+
+            // 標準出力
+            std::cout << "simulation : " << optimal_deg << "," << ber << std::endl;
+
         break;
     }
 

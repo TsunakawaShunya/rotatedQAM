@@ -8,8 +8,8 @@
 #ifndef SIMULATOR_H
 #define SIMULATOR_H
 #define _USE_MATH_DEFINES
-#include <C:/eigen-3.4.0/Eigen/Dense>
-#include <C:/eigen-3.4.0/Eigen/Eigen>
+#include </Volumes/USB1/eigen-3.4.0/Eigen/Dense>
+#include </Volumes/USB1/eigen-3.4.0/Eigen/Eigen>
 #include <cmath>
 #include <vector>
 #include <iostream>

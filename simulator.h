@@ -8,8 +8,8 @@
 #ifndef SIMULATOR_H
 #define SIMULATOR_H
 #define _USE_MATH_DEFINES
-#include </Volumes/USB1/eigen-3.4.0/Eigen/Dense>
-#include </Volumes/USB1/eigen-3.4.0/Eigen/Eigen>
+#include <C:eigen-3.4.0/Eigen/Dense>
+#include <C:eigen-3.4.0/Eigen/Eigen>
 #include <cmath>
 #include <vector>
 #include <iostream>
@@ -323,7 +323,7 @@ class Simulator {
 
     // 16QAM_1次のダイバーシチ[ディジタルコミュニケーションp.917:式(14-4-47)]
     // 16QAM理論値
-    double get16QAMTheory(double EbN0dB) {
+    double get_16QAMTheory(double EbN0dB) {
         double EbN0 = pow(10.0, 0.1 * EbN0dB);
 
         return 3.0 / 8.0 * (1.0 - 1.0 / sqrt(1.0 + 5.0 / 2.0 / EbN0))
@@ -331,14 +331,72 @@ class Simulator {
                 - 1.0 / 8.0 * (1.0 - 1.0 / sqrt(1.0 + 5.0 * 2.0 / EbN0 / 25.0));
     }
 
-    // 16QAM_L次のダイバーシチ[ディジタルコミュニケーションp.917:式(14-4-47)]
-    // デフォルトでは2次ダイバーシチ
-    double get_QAMTheory_Ldiversity(double EbN0dB, int L = 2) {
-        double EbN0 = 0.25 * pow(10.0, 0.1 * EbN0dB);
-        double mu = sqrt(EbN0 / (1.0 + EbN0));
-        double ber = pow((1.0 - mu) / 2.0, 2) * (2.0 + mu);
+    // 4QAMのL次ダイバーシチ
+    double get_4QAMTheory_Ldiversity_sim(double EbN0dB, int L = 2) {
+        double EbN0 = pow(10.0, 0.1 * EbN0dB) / (double)L;
+        double gamma_b;                         // 瞬時EbN0
+        double gamma_b_min = 0.0;
+        double gamma_b_max = 100.0;
+        double gamma_c = EbN0;                  // 伝送路当たりの平均EbN0
+        double ber = 0.0;
+        int N_div = 100000;                     // 数値積分の分割数
+        double integration = 0.0;               // 積分結果
+        double P_AWGN;
+
+        // -------- 積分（台形則）--------
+        double dx = (gamma_b_max - gamma_b_min) / (double)N_div;        // 微小区間
+        for (int i = 0; i <= N_div; ++i) {
+            gamma_b = gamma_b_min + i * dx;
+            P_AWGN = Q(sqrt(2 * gamma_b));
+            if (i == 0 || i == N_div) {
+                integration += P_AWGN
+                        * (pow(gamma_b, L - 1) * exp(- gamma_b / gamma_c));
+            } else {
+                integration += 2 * P_AWGN
+                        * (pow(gamma_b, L - 1) * exp(- gamma_b / gamma_c));
+            }
+        }
+        integration = integration * dx / 2.0;
+        // ------------------------------
+
+        ber = integration / ((double)factorial(L - 1) * pow(gamma_c, L));
         return ber;
     }
+
+    // 16QAMのL次ダイバーシチ
+    double get_16QAMTheory_Ldiversity_sim(double EbN0dB, int L = 2) {
+        double EbN0 = pow(10.0, 0.1 * EbN0dB) / (double)L;
+        double gamma_b;                         // 瞬時EbN0
+        double gamma_b_min = 0.0;
+        double gamma_b_max = 500.0;
+        double gamma_c = EbN0;                  // 伝送路当たりの平均EbN0
+        double ber = 0.0;
+        int N_div = 1000000;                     // 数値積分の分割数
+        double integration = 0.0;               // 積分結果
+        double P_AWGN;
+
+        // -------- 積分（台形則）--------
+        double dx = (gamma_b_max - gamma_b_min) / (double)N_div;        // 微小区間
+        for (int i = 0; i <= N_div; ++i) {
+            gamma_b = gamma_b_min + i * dx;
+            P_AWGN = (3.0 * Q(sqrt(4.0 / 5.0 * gamma_b)) 
+                    + 2.0 * Q(3.0 * sqrt(4.0 / 5.0 * gamma_b)) 
+                    - Q(5.0 * sqrt(4.0 / 5.0 * gamma_b))) / 4.0;
+            if (i == 0 || i == N_div) {
+                integration += P_AWGN
+                        * (pow(gamma_b, L - 1) * exp(- gamma_b / gamma_c));
+            } else {
+                integration += 2 * P_AWGN
+                        * (pow(gamma_b, L - 1) * exp(- gamma_b / gamma_c));
+            }
+        }
+        integration = integration * dx / 2.0;
+        // ------------------------------
+
+        ber = integration / ((double)factorial(L - 1) * pow(gamma_c, L));
+        return ber;
+    }
+
 
     protected:
     int numberOfSymbols_;       // シンボル数
@@ -369,12 +427,12 @@ class Simulator {
     double noiseSD_;        // 雑音の標準偏差
     int N_Tri;      // 試行回数
 
-    Eigen::Vector2cd y;     // 受信信号ベクトル
-    Eigen::Vector2cd x;     // 送信信号ベクトル
-    Eigen::Vector2d s0;      // シンボルベクトルs[0]
-    Eigen::Vector2d s1;      // シンボルベクトルs[1]
-    Eigen::Matrix2cd h;     // 伝送路応答行列
-    Eigen::Vector2cd n;     // 雑音ベクトル
+    Eigen::Vector2cd y_;     // 受信信号ベクトル
+    Eigen::Vector2cd s_;     // 送信信号ベクトル
+    Eigen::Vector2d x0_;      // 回転型QAMシンボルベクトルx[0]
+    Eigen::Vector2d x1_;      // 回転型QAMシンボルベクトルx[1]
+    Eigen::Matrix2cd h_;     // 伝送路応答行列
+    Eigen::Vector2cd n_;     // 雑音ベクトル
 
     // 乱数用
     unsigned long int seed = 10;      // seed値
@@ -404,9 +462,9 @@ class Simulator {
     // 伝送路
     // 選択性フェージング伝送路の初期化
     void initSelective() {
-        h.setZero();
-        h(0, 0) = unitCNormalRand_();
-        h(1, 1) = unitCNormalRand_();
+        h_.setZero();
+        h_(0, 0) = unitCNormalRand_();
+        h_(1, 1) = unitCNormalRand_();
         //std::cout << h << std::endl;
     }
 
@@ -417,28 +475,28 @@ class Simulator {
         txData_(1) = unitIntUniformRand_();
 
         // 送信シンボルを設定
-        s0(0) = rotatedSymbol_(txData_(0)).real();
-        s0(1) = rotatedSymbol_(txData_(0)).imag();
-        s1(0) = rotatedSymbol_(txData_(1)).real();
-        s1(1) = rotatedSymbol_(txData_(1)).imag();
+        x0_(0) = rotatedSymbol_(txData_(0)).real();
+        x0_(1) = rotatedSymbol_(txData_(0)).imag();
+        x1_(0) = rotatedSymbol_(txData_(1)).real();
+        x1_(1) = rotatedSymbol_(txData_(1)).imag();
 
         // 送信信号を設定
-        x(0).real(s0(0));
-        x(0).imag(s1(0));
-        x(1).real(s0(1));
-        x(1).imag(s1(1));
+        s_(0).real(x0_(0));
+        s_(0).imag(x1_(0));
+        s_(1).real(x0_(1));
+        s_(1).imag(x1_(1));
     }
 
     // 雑音
     void set_n() {
-        n(0) = unitCNormalRand_();
-        n(1) = unitCNormalRand_();
+        n_(0) = unitCNormalRand_();
+        n_(1) = unitCNormalRand_();
         //std::cout << noiseSD_ << "*" << n << "=" << noiseSD_ * n << std::endl;
     }
 
     // 受信
     void set_y() {
-        y = h * x + noiseSD_ * n;
+        y_ = h_ * s_ + noiseSD_ * n_;
     }
 
     // 最尤推定で復調
@@ -446,14 +504,17 @@ class Simulator {
         Eigen::VectorXd objective_0(numberOfSymbols_);        // 目的関数ベクトル第0項
         Eigen::VectorXd objective_1(numberOfSymbols_);        // 目的関数ベクトル第1項
 
-        for(int i = 0; i < numberOfSymbols_; i++) {
-            s0(0) = rotatedSymbol_(i).real();
-            s0(1) = rotatedSymbol_(i).imag();
-            s1(0) = rotatedSymbol_(i).real();
-            s1(1) = rotatedSymbol_(i).imag();
+        Eigen::Vector2d x0;      // 回転型QAMシンボルベクトルx[0]の候補
+        Eigen::Vector2d x1;      // 回転型QAMシンボルベクトルx[1]の候補
 
-            objective_0(i) = (h * ((h.inverse() * y).real() - s0)).norm();
-            objective_1(i) = (h * ((h.inverse() * y).imag() - s1)).norm();
+        for(int i = 0; i < numberOfSymbols_; i++) {
+            x0(0) = rotatedSymbol_(i).real();
+            x0(1) = rotatedSymbol_(i).imag();
+            x1(0) = rotatedSymbol_(i).real();
+            x1(1) = rotatedSymbol_(i).imag();
+
+            objective_0(i) = (h_ * ((h_.inverse() * y_).real() - x0)).norm();
+            objective_1(i) = (h_ * ((h_.inverse() * y_).imag() - x1)).norm();
         }
         
         Eigen::VectorXd::Index col0;
@@ -509,6 +570,12 @@ class Simulator {
         return std::tgamma(n + 1) / (std::tgamma(k + 1) * std::tgamma(n - k + 1));
     }
 
+    // 階乗
+    int factorial(int n) {
+        if (n == 0) return 1;
+        return n * factorial(n - 1);
+    }
+
     // iとi_hatでループしてα，ω，γ，ζ，κの行列に代入
     void set_alphaOmegaKappaGammaZeta(double theta) {
         // シンボル数 × シンボル数
@@ -558,6 +625,25 @@ class Simulator {
     // Q関数
     double Q(double x) {
         return 1.0 / 2.0 * std::erfc(x / sqrt(2.0));
+    }
+
+    // 数値積分（台形則）
+    // [min, max]: 積分範囲，N_div: 分割数，func: 関数
+    double integration(double min, double max, int N_div, double(*func)(double)) {
+        double dx = (max - min) / N_div;  // 区間幅
+        double sum = 0.0;
+
+        // 積分
+        for (int i = 0; i <= N_div; ++i) {
+            double x = min + i * dx;
+            if (i == 0 || i == N_div) {
+                sum += func(x);
+            } else {
+                sum += 2 * func(x);
+            }
+        }
+
+        return sum * dx / 2.0;
     }
 };
 #endif /* SIMULATOR_H */

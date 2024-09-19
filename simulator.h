@@ -17,7 +17,11 @@
 #include <string>
 #include <complex>
 #include <bitset>
+#include <cmath>
 #include <functional>
+#include <boost/math/special_functions/hypergeometric_pFq.hpp>
+#include <initializer_list>
+#include <stdexcept>
 #include "random_collection.h"
 
 class Simulator {
@@ -363,6 +367,16 @@ class Simulator {
         return ber;
     }
 
+    // 4QAMのL次ダイバーシチ（超幾何関数）
+    double get_4QAMTheory_Ldiversity_hyp(double EbN0dB, int L = 2) {
+        double EbN0 = pow(10.0, 0.1 * EbN0dB) / (double)L;
+        double gamma_c = EbN0;                  // 伝送路当たりの平均EbN0
+
+        return 1 / (2 * factorial(L - 1) * pow(gamma_c, L)) 
+                * boost::math::tgamma(L + 0.5) / (sqrt(M_PI) * L * pow((1 / gamma_c + 1), L))
+                * hypergeometric_2F1(0.5, L, L + 1, 1 / (1 + gamma_c));
+    }
+
     // 16QAMのL次ダイバーシチ
     double get_16QAMTheory_Ldiversity_sim(double EbN0dB, int L = 2) {
         double EbN0 = pow(10.0, 0.1 * EbN0dB) / (double)L;
@@ -644,6 +658,19 @@ class Simulator {
         }
 
         return sum * dx / 2.0;
+    }
+
+    // ガウスの超幾何関数2F1(a, b; c; z)
+    double hypergeometric_2F1(double a, double b, double c, double z) {
+        std::initializer_list<double> aj = {a, b};
+        std::initializer_list<double> bj = {c};
+
+        try {
+            return boost::math::hypergeometric_pFq(aj, bj, z);
+        } catch (const std::exception& e) {
+            std::cerr << "Error computing hypergeometric_2F1: " << e.what() << std::endl;
+            throw;
+        }
     }
 };
 #endif /* SIMULATOR_H */

@@ -335,8 +335,8 @@ class Simulator {
                 - 1.0 / 8.0 * (1.0 - 1.0 / sqrt(1.0 + 5.0 * 2.0 / EbN0 / 25.0));
     }
 
-    // 4QAMのL次ダイバーシチ
-    double get_4QAMTheory_Ldiversity_sim(double EbN0dB, int L = 2) {
+    // 4QAMのL次ダイバーシチ（積分）
+    double get_4QAMTheory_Ldiversity_int(double EbN0dB, int L = 2) {
         double EbN0 = pow(10.0, 0.1 * EbN0dB) / (double)L;
         double gamma_b;                         // 瞬時EbN0
         double gamma_b_min = 0.0;
@@ -377,8 +377,8 @@ class Simulator {
                 * hypergeometric_2F1(0.5, L, L + 1, 1 / (1 + gamma_c));
     }
 
-    // 16QAMのL次ダイバーシチ
-    double get_16QAMTheory_Ldiversity_sim(double EbN0dB, int L = 2) {
+    // 16QAMのL次ダイバーシチ（積分）
+    double get_16QAMTheory_Ldiversity_int(double EbN0dB, int L = 2) {
         double EbN0 = pow(10.0, 0.1 * EbN0dB) / (double)L;
         double gamma_b;                         // 瞬時EbN0
         double gamma_b_min = 0.0;
@@ -411,6 +411,19 @@ class Simulator {
         return ber;
     }
 
+    // 16QAMのL次ダイバーシチ（超幾何関数）
+    double get_16QAMTheory_Ldiversity_hyp(double EbN0dB, int L = 2) {
+        double EbN0 = pow(10.0, 0.1 * EbN0dB) / (double)L;
+        double gamma_c = EbN0;                  // 伝送路当たりの平均EbN0
+
+        return 1 / (4 * factorial(L - 1) * pow(gamma_c, L)) 
+                * ((3 * boost::math::tgamma(L + 0.5)) / (2 * sqrt(M_PI) * L * pow((1 / gamma_c + 2.0 / 5.0), L))
+                * hypergeometric_2F1(0.5, L, L + 1, (1 / gamma_c) / (1 / gamma_c + 2.0 / 5.0))
+                + (2 * boost::math::tgamma(L + 0.5)) / (2 * sqrt(M_PI) * L * pow((1 / gamma_c + 18.0 / 5.0), L))
+                * hypergeometric_2F1(0.5, L, L + 1, (1 / gamma_c) / (1 / gamma_c + 18.0 / 5.0))
+                - (boost::math::tgamma(L + 0.5)) / (2 * sqrt(M_PI) * L * pow((1 / gamma_c + 50.0 / 5.0), L))
+                * hypergeometric_2F1(0.5, L, L + 1, (1 / gamma_c) / (1 / gamma_c + 50.0 / 5.0)));
+    }
 
     protected:
     int numberOfSymbols_;       // シンボル数

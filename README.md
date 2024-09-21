@@ -25,3 +25,6 @@
 4. ```g++ -std=c++17 -IC:\boost_1_86_0 -o diversity_hyp diversity_hyp.cpp```でコンパイル</br>
 もし，エラーが出たらおそらくmutexに関することなので`boost_1_86_0/boost/math/special_functions/detail/polygamma.hpp`の409~412行目をコメントアウトしておく（boost1_86_0の場合）
 5. `./diversity_hyp`でdiversity_hyp.exeを実行
+
+## macでやってみた
+eigenとboostインストールしてないから研究室行かないとできない

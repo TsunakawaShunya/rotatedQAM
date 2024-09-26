@@ -23,8 +23,8 @@ int main() {
 
     switch(sim.NUMBER_OF_BIT) {
         case 2:
-            filenameTheory_1 = "QPSK_theory_1Diversity_sim.csv";
-            filenameTheory_2 = "QPSK_theory_2Diversity_sim.csv";
+            filenameTheory_1 = "QPSK_theory_1Diversity_int.csv";
+            filenameTheory_2 = "QPSK_theory_2Diversity_int.csv";
             ofsTheory_1.open(filenameTheory_1);
             ofsTheory_2.open(filenameTheory_2);
 
@@ -32,9 +32,9 @@ int main() {
                 sim.set_QPSKNoiseSD(EbN0dB);
 
                 // 標準出力
-                berTheory_1 = sim.get_4QAMTheory_Ldiversity_sim(EbN0dB, 1);
+                berTheory_1 = sim.get_4QAMTheory_Ldiversity_int(EbN0dB, 1);
                 std::cout << "Theory sim(1-Diversity) : " << EbN0dB << "," << berTheory_1 << std::endl;
-                berTheory_2 = sim.get_4QAMTheory_Ldiversity_sim(EbN0dB, 2);
+                berTheory_2 = sim.get_4QAMTheory_Ldiversity_int(EbN0dB, 2);
                 std::cout << "Theory sim(2-Diversity) : " << EbN0dB << "," << berTheory_2 << std::endl;
 
                 // ファイル出力
@@ -45,17 +45,17 @@ int main() {
             ofsTheory_2.close();
         break;
         case 4:
-            filenameTheory_1 = "16QAM_theory_1Diversity_sim.csv";
-            filenameTheory_2 = "16QAM_theory_2Diversity_sim.csv";
+            filenameTheory_1 = "16QAM_theory_1Diversity_int.csv";
+            filenameTheory_2 = "16QAM_theory_2Diversity_int.csv";
             ofsTheory_1.open(filenameTheory_1);
             ofsTheory_2.open(filenameTheory_2);
 
             for(double EbN0dB = EbN0dBmin; EbN0dB <= EbN0dBmax; EbN0dB += EbN0dBstp) {
                 sim.set_QPSKNoiseSD(EbN0dB);
                 // 標準出力
-                berTheory_1 = sim.get_16QAMTheory_Ldiversity_sim(EbN0dB, 1);
+                berTheory_1 = sim.get_16QAMTheory_Ldiversity_int(EbN0dB, 1);
                 std::cout << "Theory sim(1-Diversity) : " << EbN0dB << "," << berTheory_1 << std::endl;
-                berTheory_2 = sim.get_16QAMTheory_Ldiversity_sim(EbN0dB, 2);
+                berTheory_2 = sim.get_16QAMTheory_Ldiversity_int(EbN0dB, 2);
                 std::cout << "Theory sim(2-Diversity) : " << EbN0dB << "," << berTheory_2 << std::endl;
 
                 // ファイル出力

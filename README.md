@@ -11,12 +11,9 @@
 - 厳密な上界の算出
 - ニュートン法により最適な回転角導出
 - QPSKと16QAMの1次ダイバーシチ
-- QPSKの2次ダイバーシチ
+- QPSKと16QAMの2次ダイバーシチ
 
 ## 今後の課題
-- ニュートン法でしか解を求めていないため，その付近で地道に解を求める
-  - 全部0とかになってる
-- 16QAMの2次ダイバーシチを引く
 
 ## boostライブラリの使い方？
 1. boostをインストール
@@ -25,6 +22,3 @@
 4. ```g++ -std=c++17 -IC:\boost_1_86_0 -o diversity_hyp diversity_hyp.cpp```でコンパイル</br>
 もし，エラーが出たらおそらくmutexに関することなので`boost_1_86_0/boost/math/special_functions/detail/polygamma.hpp`の409~412行目をコメントアウトしておく（boost1_86_0の場合）
 5. `./diversity_hyp`でdiversity_hyp.exeを実行
-
-## macでやってみた
-eigenとboostインストールしてないから研究室行かないとできない

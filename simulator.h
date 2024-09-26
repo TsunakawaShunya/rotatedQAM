@@ -268,24 +268,24 @@ class Simulator {
 
     // ニュートン法
     // func: 最適化対象の関数, initial_guess: 最適化の初期推定値, max_iter: 最大反復回数（デフォルトは100）, tol: 収束判定のための勾配の閾値（デフォルトは1e-9）
-    double get_optimizeTheta_rad_byNewton(std::function<double(double)> func, double initial_guess, int max_iter = 100, double tol = 1e-12) {
-        double x = initial_guess;
+    double get_optimizeTheta_deg_byNewton(std::function<double(double)> func, double initial_deg, int max_iter = 100, double tol = 1e-12) {
+        double x_rad = initial_deg * M_PI / 180.0;
         for (int i = 0; i < max_iter; ++i) {
             // 更新
-            x = x - numerical_derivative(func, x) / numerical_second_derivative(func, x);
+            x_rad = x_rad - numerical_derivative(func, x_rad) / numerical_second_derivative(func, x_rad);
             
             // 収束判定
-            if (std::abs(numerical_derivative(func, x)) < tol) {
+            if (std::abs(numerical_derivative(func, x_rad)) < tol) {
                 std::cout << "------------" << i << " times search------------" << std::endl;
                 break;
             }
         }
-        return x;
+        return x_rad * 180.0 / M_PI;
     }
 
     // 解を求める（気合）
     // resolution：分解能
-    double get_optimizeTheta_deg(std::function<double(double)> func, double start_deg, double end_deg, double resolution_deg) {
+    double get_optimizeTheta_deg(std::function<double(double)> func, double start_deg, double end_deg, double resolution_deg = 1e-04) {
         //std::cout << "initial params" << std::endl;
         //std::cout << start_deg << ", " << end_deg << ", " << resolution_deg << std::endl;
 

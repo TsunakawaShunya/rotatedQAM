@@ -1,4 +1,4 @@
-// 2次のダイバーシチ
+// L次のダイバーシチ（数値積分）
 #include "simulator.h"
 
 // SNR
@@ -33,9 +33,9 @@ int main() {
 
                 // 標準出力
                 berTheory_1 = sim.get_4QAMTheory_Ldiversity_int(EbN0dB, 1);
-                std::cout << "Theory sim(1-Diversity) : " << EbN0dB << "," << berTheory_1 << std::endl;
+                std::cout << "Theory int(1-Diversity) : " << EbN0dB << "," << berTheory_1 << std::endl;
                 berTheory_2 = sim.get_4QAMTheory_Ldiversity_int(EbN0dB, 2);
-                std::cout << "Theory sim(2-Diversity) : " << EbN0dB << "," << berTheory_2 << std::endl;
+                std::cout << "Theory int(2-Diversity) : " << EbN0dB << "," << berTheory_2 << std::endl;
 
                 // ファイル出力
                 ofsTheory_1 << EbN0dB << "," << berTheory_1 << std::endl;
@@ -54,9 +54,9 @@ int main() {
                 sim.set_QPSKNoiseSD(EbN0dB);
                 // 標準出力
                 berTheory_1 = sim.get_16QAMTheory_Ldiversity_int(EbN0dB, 1);
-                std::cout << "Theory sim(1-Diversity) : " << EbN0dB << "," << berTheory_1 << std::endl;
+                std::cout << "Theory int(1-Diversity) : " << EbN0dB << "," << berTheory_1 << std::endl;
                 berTheory_2 = sim.get_16QAMTheory_Ldiversity_int(EbN0dB, 2);
-                std::cout << "Theory sim(2-Diversity) : " << EbN0dB << "," << berTheory_2 << std::endl;
+                std::cout << "Theory int(2-Diversity) : " << EbN0dB << "," << berTheory_2 << std::endl;
 
                 // ファイル出力
                 ofsTheory_1 << EbN0dB << "," << berTheory_1 << std::endl;

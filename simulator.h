@@ -244,9 +244,9 @@ class Simulator {
         std::cout << symbol_ << std::endl;
     }
 
-    // 一般化
+    // シンボル設計（一般化）
     void setSymbol() {
-        int M = 1 << NUMBER_OF_BIT;             // M = 2^NUMBER_OF_BIT (シンボル数)
+        int M = numberOfSymbols_;               // M = 2^NUMBER_OF_BIT (シンボル数)
         int sqrtM = sqrt(M);                    // 実部/虚部のレベル数 (例: 16QAMならsqrtM=4)
         double P = 1.0 / (2.0 * (M - 1) / 3.0); // 平均送信電力の正規化
 
@@ -274,7 +274,7 @@ class Simulator {
     }
 
     // 加法性雑音の標準偏差を設定
-    void set_NoiseSD(double EbN0dB) {
+    void setNoiseSD(double EbN0dB) {
         noiseSD_ = sqrt(pow(10.0, -0.1 * EbN0dB) / (double)NUMBER_OF_BIT);        // Eb/N0 [dB] から変換
     }
 

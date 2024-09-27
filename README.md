@@ -14,6 +14,12 @@
 - QPSKと16QAMの2次ダイバーシチ
 
 ## 今後の課題
+- 64QAM
+    - [x] 横軸 $\theta$ の上界
+    - [ ] 最適な $\theta$ の算出
+    - [ ] 横軸 $E_b/N_0$ の上界
+    - [ ] 横軸 $\theta$ のシミュレーション
+    - [ ] 横軸 $E_b/N_0$ のシミュレーション
 
 ## boostライブラリの使い方？
 1. boostをインストール
@@ -21,4 +27,4 @@
 3. c_cpp_properties.jsonにインクルードパスを書く
 4. ```g++ -std=c++17 -IC:\boost_1_86_0 -o diversity_hyp diversity_hyp.cpp```でコンパイル</br>
 もし，エラーが出たらおそらくmutexに関することなので`boost_1_86_0/boost/math/special_functions/detail/polygamma.hpp`の409~412行目をコメントアウトしておく（boost1_86_0の場合）
-5. `./diversity_hyp`でdiversity_hyp.exeを実行
+1. `./diversity_hyp`でdiversity_hyp.exeを実行

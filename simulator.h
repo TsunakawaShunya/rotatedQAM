@@ -32,7 +32,7 @@ class Simulator {
     Simulator() {
         // 次元を設定
         std::cout << "--------------------------------------------------------------------" << std::endl;
-        std::cout << "Number of Bit? (QPSK:2, 16QAM:4)" << std::endl;
+        std::cout << "Number of Bit? (QPSK:2, 16QAM:4, 64QAM:6, 256QAM:8, 1024QAM:10)" << std::endl;
         std::cout << "--------------------------------------------------------------------" << std::endl;
         std::cin >> NUMBER_OF_BIT;
 
@@ -66,7 +66,7 @@ class Simulator {
     }
 
     // シンボル設計
-    void setSymbol() {
+    void setSymbol_non_gene() {
         switch(NUMBER_OF_BIT) {
             // 4QAM(QPSK)
             case 2:
@@ -126,8 +126,137 @@ class Simulator {
                     }
                 }
             break;
+            // 64QAM
+            case 6:
+                P = 1.0 / 42.0;
+
+                for(int i = 0; i < numberOfSymbols_; i++) {
+                    // 実部の設計(5, 6ビット目で決まる)
+                    switch((grayNum_[i] >> 4) & 0b1111) {
+                        case 0b0000: 
+                            symbol_(i).real(-7 * sqrt(P));
+                        break;
+                        case 0b0001: 
+                            symbol_(i).real(-5 * sqrt(P));
+                        break;
+                        case 0b0011: 
+                            symbol_(i).real(-3 * sqrt(P));
+                        break;
+                        case 0b0010: 
+                            symbol_(i).real(-1 * sqrt(P));
+                        break;
+                        case 0b0110: 
+                            symbol_(i).real(1 * sqrt(P));
+                        break;
+                        case 0b0111: 
+                            symbol_(i).real(3 * sqrt(P));
+                        break;
+                        case 0b0101: 
+                            symbol_(i).real(5 * sqrt(P));
+                        break;
+                        case 0b0100: 
+                            symbol_(i).real(7 * sqrt(P));
+                        break;
+                        case 0b1100: 
+                            symbol_(i).real(9 * sqrt(P));
+                        break;
+                        case 0b1101: 
+                            symbol_(i).real(11 * sqrt(P));
+                        break;
+                        case 0b1111: 
+                            symbol_(i).real(13 * sqrt(P));
+                        break;
+                        case 0b1110: 
+                            symbol_(i).real(15 * sqrt(P));
+                        break;
+                        case 0b1010: 
+                            symbol_(i).real(-15 * sqrt(P));
+                        break;
+                        case 0b1011: 
+                            symbol_(i).real(-13 * sqrt(P));
+                        break;
+                        case 0b1001: 
+                            symbol_(i).real(-11 * sqrt(P));
+                        break;
+                        case 0b1000: 
+                            symbol_(i).real(-9 * sqrt(P));
+                        break;
+                    }
+
+                    // 虚部の設計(3, 4ビット目で決まる)
+                    switch((grayNum_[i] >> 2) & 0b11) {
+                        case 0b00: 
+                            symbol_(i).imag(-7 * sqrt(P));
+                        break;
+                        case 0b01: 
+                            symbol_(i).imag(-5 * sqrt(P));
+                        break;
+                        case 0b11: 
+                            symbol_(i).imag(-3 * sqrt(P));
+                        break;
+                        case 0b10: 
+                            symbol_(i).imag(-1 * sqrt(P));
+                        break;
+                        case 0b110: 
+                            symbol_(i).imag(1 * sqrt(P));
+                        break;
+                        case 0b111: 
+                            symbol_(i).imag(3 * sqrt(P));
+                        break;
+                        case 0b101: 
+                            symbol_(i).imag(5 * sqrt(P));
+                        break;
+                        case 0b100: 
+                            symbol_(i).imag(7 * sqrt(P));
+                        break;
+                    }
+
+                    // 1, 2ビット目の設計
+                    switch(grayNum_[i] & 0b11) {
+                        case 0b00: 
+                            symbol_(i).imag(-7 * sqrt(P));
+                        break;
+                        case 0b01: 
+                            symbol_(i).imag(-5 * sqrt(P));
+                        break;
+                        case 0b11: 
+                            symbol_(i).imag(-3 * sqrt(P));
+                        break;
+                        case 0b10: 
+                            symbol_(i).imag(-1 * sqrt(P));
+                        break;
+                        case 0b110: 
+                            symbol_(i).imag(1 * sqrt(P));
+                        break;
+                        case 0b111: 
+                            symbol_(i).imag(3 * sqrt(P));
+                        break;
+                        case 0b101: 
+                            symbol_(i).imag(5 * sqrt(P));
+                        break;
+                        case 0b100: 
+                            symbol_(i).imag(7 * sqrt(P));
+                        break;
+                    }
+                }
+            break;
         }
-        //std::cout << symbol_ << std::endl;
+        std::cout << symbol_ << std::endl;
+    }
+
+    // 一般化
+    void setSymbol() {
+        int M = 1 << NUMBER_OF_BIT;             // M = 2^NUMBER_OF_BIT (シンボル数)
+        int sqrtM = sqrt(M);                    // 実部/虚部のレベル数 (例: 16QAMならsqrtM=4)
+        double P = 1.0 / (2.0 * (M - 1) / 3.0); // 平均送信電力の正規化
+
+        for (int i = 0; i < numberOfSymbols_; i++) {
+            int realBits = grayNum_[i] & ((1 << (NUMBER_OF_BIT / 2)) - 1);                          // ビット列の後半（実部）
+            int imagBits = (grayNum_[i] >> (NUMBER_OF_BIT / 2)) & ((1 << (NUMBER_OF_BIT / 2)) - 1); // ビット列の前半（虚部）
+
+            symbol_(i).real(-(2 * realBits - (sqrtM - 1)) * sqrt(P));
+            symbol_(i).imag(-(2 * imagBits - (sqrtM - 1)) * sqrt(P));
+        }
     }
 
     // シンボル回転
@@ -144,24 +273,11 @@ class Simulator {
         }
     }
 
-    // Walsh Hadamard行列後のシンボル
-    /*
-    void setSymbol_WalshHadamard(){
-        for(int i = 0; i < numberOfSymbols_; i++) {
-            symbol_(i).real(M_SQRT1_2 * (cos(phi_(i)) + sin(phi_(i))));
-            symbol_(i).imag(M_SQRT1_2 * (cos(phi_(i)) - sin(phi_(i))));
-        }
-    }
-    */
-
     // 加法性雑音の標準偏差を設定
-    void set_QPSKNoiseSD(double EbN0dB) {
-        noiseSD_ = sqrt(0.5 * pow(10.0, -0.1 * EbN0dB));        // Eb/N0 [dB] から変換
+    void set_NoiseSD(double EbN0dB) {
+        noiseSD_ = sqrt(pow(10.0, -0.1 * EbN0dB) / (double)NUMBER_OF_BIT);        // Eb/N0 [dB] から変換
     }
 
-    void set_16QAMNoiseSD(double EbN0dB) {
-        noiseSD_ = sqrt(0.25 * pow(10.0, -0.1 * EbN0dB));        // Eb/N0 [dB] から変換
-    }
 
     // 結果
     // シミュレーション

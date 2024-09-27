@@ -44,8 +44,6 @@ void processTheta(Simulator& sim, std::ofstream& ofsUpperBoundSum, std::ofstream
                   std::vector<std::ofstream>& ofsUpperBound, std::vector<std::ofstream>& ofsNearlyUpperBound) {
 
     for(double theta = theta_min; theta <= theta_max; theta += theta_stp) {
-        sim.setRotationSymbol(theta);       // 回転
-
         berUpperBoundVec = sim.getBerUpperBoundVec(theta);
         berNearlyUpperBoundVec = sim.get_nearlyBerUpperBoundVec(theta);
 
@@ -98,7 +96,7 @@ int main() {
 
     // ファイル生成と処理の呼び出し
     initializeFiles(sim, ofsUpperBoundSum, ofsNearlyUpperBoundSum, ofsUpperBound, ofsNearlyUpperBound);
-    sim.set_NoiseSD(EbN0dB);
+    sim.setNoiseSD(EbN0dB);
     processTheta(sim, ofsUpperBoundSum, ofsNearlyUpperBoundSum, ofsUpperBound, ofsNearlyUpperBound);
 
     // ファイルを閉じる

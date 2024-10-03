@@ -291,6 +291,57 @@ class Simulator {
         return (double)berCnt / (double)N_Tri / (double)NUMBER_OF_BIT / 2.0;
     }
 
+    // L次ダイバーシチシミュレーション
+    double getBerSimulation_Ldiversity(int L) {
+        int txData;                 // 送信データ
+        int rxData;                 // 受信データ
+        Eigen::VectorXcd x(L);      // 送信シンボルベクトル（L個）
+        Eigen::VectorXcd y(1);      // 受信シンボル
+        Eigen::VectorXcd h(L);      // 伝送路応答行列
+        Eigen::VectorXcd n(L);      // 雑音
+        Eigen::VectorXd obj(numberOfSymbols_);  // 目的関数ベクトル
+        int numberOfErrorBit = 0;   // エラービット数
+
+        for (int trial = 0; trial < N_Tri; trial++) {
+            // 初期化
+            y(0) = 0.0;
+
+            // 送信データ生成
+            txData = unitIntUniformRand_();
+            for (int l = 0; l < L; l++) {
+                x(l) = symbol_(txData); 
+                h(l) = unitCNormalRand_();   // 伝送路
+                n(l) = unitCNormalRand_();   // 雑音
+            }
+
+            // 受信信号の計算
+            for (int l = 0; l < L; l++) {
+                y(0) += h(l) * x(l);
+            }
+            y(0) += noiseSD_ * n.sum(); // 雑音を全体に追加
+
+            // 受信シンボルをもとにデータを復調
+            for (int i = 0; i < numberOfSymbols_; i++) {
+                Eigen::VectorXcd hx(1);
+                hx(0) = 0.0;
+                for(int l = 0; l < L; l++) {
+                    hx(0) += h(l) * symbol_(i);
+                }
+                obj(i) = std::abs(y(0) - hx(0));
+            }
+
+            // 最小の目的関数値を持つシンボルを推定
+            Eigen::VectorXd::Index col;
+            obj.minCoeff(&col);
+            rxData = col;
+
+            // ビットエラー数をカウント
+            numberOfErrorBit += hammingDistance(rxData, txData);
+        }
+
+        // ビット誤り率を計算
+        return static_cast<double>(numberOfErrorBit) / (N_Tri * NUMBER_OF_BIT);
+    }
 
     // 理論値
     // QPSK平均BERの上界

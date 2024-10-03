@@ -20,6 +20,7 @@ int main() {
     Simulator sim;
 
     sim.setSymbol();        // 従来QAMでのシンボル設計
+    sim.setNoiseSD(EbN0dB);
 
     switch(sim.NUMBER_OF_BIT) {
         case 2:
@@ -29,7 +30,6 @@ int main() {
             ofsTheory_2.open(filenameTheory_2);
 
             for(double EbN0dB = EbN0dBmin; EbN0dB <= EbN0dBmax; EbN0dB += EbN0dBstp) {
-                sim.set_QPSKNoiseSD(EbN0dB);
 
                 // 標準出力
                 berTheory_1 = sim.get_4QAMTheory_Ldiversity_int(EbN0dB, 1);
@@ -51,7 +51,6 @@ int main() {
             ofsTheory_2.open(filenameTheory_2);
 
             for(double EbN0dB = EbN0dBmin; EbN0dB <= EbN0dBmax; EbN0dB += EbN0dBstp) {
-                sim.set_QPSKNoiseSD(EbN0dB);
                 // 標準出力
                 berTheory_1 = sim.get_16QAMTheory_Ldiversity_int(EbN0dB, 1);
                 std::cout << "Theory int(1-Diversity) : " << EbN0dB << "," << berTheory_1 << std::endl;

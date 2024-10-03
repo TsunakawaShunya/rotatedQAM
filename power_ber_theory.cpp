@@ -33,22 +33,22 @@ void initializeFiles(Simulator& sim, std::ofstream& ofsUpperBoundSum,
                 std::ofstream& ofsNearlyUpperBoundSum, 
                 std::vector<std::ofstream>& ofsUpperBound, 
                 std::vector<std::ofstream>& ofsNearlyUpperBound) {
-    // 2^NUMBER_OF_BITの計算 (QAMの階数)
-    int modulationOrder = static_cast<int>(std::pow(2, sim.NUMBER_OF_BIT));
+    // 多値数
+    int M = static_cast<int>(std::pow(2, sim.NUMBER_OF_BIT));
 
     // ファイル名の作成
-    std::string filenameUpperBoundSum = "Rotated" + std::to_string(modulationOrder) + "QAM_upperbound_" + std::to_string(theta_deg) + "deg.csv";
+    std::string filenameUpperBoundSum = "Rotated" + std::to_string(M) + "QAM_upperbound_" + std::to_string(theta_deg) + "deg.csv";
     ofsUpperBoundSum.open(filenameUpperBoundSum);
 
-    std::string filenameNearlyUpperBoundSum = "Rotated" + std::to_string(modulationOrder) + "QAM_nearly_upperbound_" + std::to_string(theta_deg) + "deg.csv";
+    std::string filenameNearlyUpperBoundSum = "Rotated" + std::to_string(M) + "QAM_nearly_upperbound_" + std::to_string(theta_deg) + "deg.csv";
     ofsNearlyUpperBoundSum.open(filenameNearlyUpperBoundSum);
 
     // 各ビットごとのファイル名を作成
     for (int i = 0; i < sim.NUMBER_OF_BIT; i++) {
-        std::string filenameUpperBound = "Rotated" + std::to_string(modulationOrder) + "QAM_upperbound_" + std::to_string(theta_deg) + "deg.csv" + std::to_string(i + 1) + ".csv";
+        std::string filenameUpperBound = "Rotated" + std::to_string(M) + "QAM_upperbound_" + std::to_string(theta_deg) + "deg.csv" + std::to_string(i + 1) + ".csv";
         ofsUpperBound[i].open(filenameUpperBound);
 
-        std::string filenameNearlyUpperBound = "Rotated" + std::to_string(modulationOrder) + "QAM_nearly_upperbound_" + std::to_string(theta_deg) + "deg.csv" + std::to_string(i + 1) + ".csv";
+        std::string filenameNearlyUpperBound = "Rotated" + std::to_string(M) + "QAM_nearly_upperbound_" + std::to_string(theta_deg) + "deg.csv" + std::to_string(i + 1) + ".csv";
         ofsNearlyUpperBound[i].open(filenameNearlyUpperBound);
     }
 }
@@ -83,6 +83,7 @@ void process(Simulator& sim, std::ofstream& ofsUpperBoundSum, std::ofstream& ofs
     }
 }
 
+// main部
 int main() {
     Simulator sim;
     std::cout << "--------------------------------------------------------------------" << std::endl;

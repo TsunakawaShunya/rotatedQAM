@@ -1,11 +1,4 @@
-// SNに対するBER
-/*  
-    最適な回転角
-    QPSK: 27.3678°
-    16QAM: 21.0148°
-    64QAM: 20.9291°
-    256QAM: 21.0098°
-*/
+// L次ダイバーシチ（シミュレーション）
 
 #include "simulator.h"
 
@@ -15,9 +8,8 @@ static const double EbN0dBmax = 40.0;       // Eb/N0 の最大値 [dB]
 static const double EbN0dBstp = 5.0;        // Eb/N0 の間隔 [dB]
 double EbN0dB;
 
-// 回転角
-double theta_deg;
-double theta;
+// ダイバーシチ
+int L;
 
 // ファイル
 std::string filename;
@@ -29,20 +21,16 @@ double ber;                                 // BERシミュレーション値
 int main() {   
     Simulator sim;
     std::cout << "--------------------------------------------------------------------" << std::endl;
-    std::cout << "SN - BER" << std::endl;
+    std::cout << "L?" << std::endl;
     std::cout << "--------------------------------------------------------------------" << std::endl;
-    std::cout << "theta? [deg]" << std::endl;
-    std::cout << "--------------------------------------------------------------------" << std::endl;
-    std::cin >> theta_deg;
-    theta = theta_deg * M_PI / 180;
+    std::cin >> L;
 
     // シンボル設計
     sim.setSymbol();                        // 従来QAMでのシンボル設計
-    sim.setRotationSymbol(theta);           // 回転
 
     // ファイルの初期化
     int M = std::pow(sim.NUMBER_OF_BIT, 2);     // 多値数
-    filename = "Rotated" + std::to_string(M) + "QAM_sim_" + std::to_string(theta_deg) + "deg.csv";
+    filename = std::to_string(M) + "QAM_theory_" + std::to_string(L) + "diversity.csv";
     ofs.open(filename);
 
     // Eb/N0[dB]でループ
@@ -50,7 +38,7 @@ int main() {
         sim.setNoiseSD(EbN0dB);
 
         // シミュレーション
-        ber = sim.getBerSimulation();
+        ber = sim.getBerSimulation_Ldiversity(L);
 
         // 標準出力
         std::cout << "--------------------------------------------" << std::endl;

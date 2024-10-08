@@ -259,6 +259,16 @@ class Simulator {
         }
     }
 
+    // シンボルの平均電力チェック
+    void checkSymbolPower() {
+        double avgPower = 0.0;
+        for (int i = 0; i < numberOfSymbols_; i++) {
+            avgPower += std::norm(symbol_(i));  // シンボルの電力 = 実部^2 + 虚部^2
+        }
+        avgPower /= numberOfSymbols_;
+        std::cout << "Average Symbol Power: " << avgPower << std::endl;
+    }
+
     // シンボル回転
     void setRotationSymbol(double theta) {
         // 回転行列の設定
@@ -278,7 +288,6 @@ class Simulator {
         noiseSD_ = sqrt(pow(10.0, -0.1 * EbN0dB) / (double)NUMBER_OF_BIT);        // Eb/N0 [dB] から変換
     }
 
-
     // 結果
     // シミュレーション
     double getBerSimulation() {
@@ -291,46 +300,48 @@ class Simulator {
         return (double)berCnt / (double)N_Tri / (double)NUMBER_OF_BIT / 2.0;
     }
 
-    // L次ダイバーシチシミュレーション
+    // L次ダイバーシチシミュレーションまだ間違えている
     double getBerSimulation_Ldiversity(int L) {
         int txData;                 // 送信データ
         int rxData;                 // 受信データ
-        Eigen::VectorXcd x(L);      // 送信シンボルベクトル（L個）
-        Eigen::VectorXcd y(1);      // 受信シンボル
-        Eigen::VectorXcd h(L);      // 伝送路応答行列
+        std::complex<double> s;     // 送信シンボル
+        std::complex<double> r;     // 受信シンボル
+        Eigen::VectorXcd x(L);      // 送信シンボルベクトル
+        Eigen::VectorXcd y(L);      // 受信シンボルベクトル
+        Eigen::MatrixXcd h(L, L);   // 伝送路応答行列
         Eigen::VectorXcd n(L);      // 雑音
         Eigen::VectorXd obj(numberOfSymbols_);  // 目的関数ベクトル
         int numberOfErrorBit = 0;   // エラービット数
 
         for (int trial = 0; trial < N_Tri; trial++) {
             // 初期化
-            y(0) = 0.0;
-
+            h.setZero();
             // 送信データ生成
             txData = unitIntUniformRand_();
+            s = symbol_(txData);
             for (int l = 0; l < L; l++) {
-                x(l) = symbol_(txData); 
-                h(l) = unitCNormalRand_();   // 伝送路
-                n(l) = unitCNormalRand_();   // 雑音
+                x(l) = s / (double)L;
+                h(l, l) = unitCNormalRand_();               // 伝送路
+                n(l) = unitCNormalRand_() / (double)L;      // 雑音
             }
 
-            // 受信信号の計算
-            for (int l = 0; l < L; l++) {
-                y(0) += h(l) * x(l);
-            }
-            y(0) += noiseSD_ * n.sum(); // 雑音を全体に追加
+            // 受信
+            y = x + noiseSD_ * h.inverse() * n;
+            /*
+            std::cout << "y = " << y << std::endl;
+            std::cout << "x = " << x << std::endl;
+            std::cout << "h = " << h << std::endl;
+            std::cout << "n = " << n << std::endl;
+            */
 
-            // 受信シンボルをもとにデータを復調
+            // 合成
+            r = y.sum();
+            // std::cout << "r = " << r << std::endl;
+
+            // 最尤推定
             for (int i = 0; i < numberOfSymbols_; i++) {
-                Eigen::VectorXcd hx(1);
-                hx(0) = 0.0;
-                for(int l = 0; l < L; l++) {
-                    hx(0) += h(l) * symbol_(i);
-                }
-                obj(i) = std::abs(y(0) - hx(0));
+                obj(i) = std::norm(r - (double)L * symbol_(i));
             }
-
-            // 最小の目的関数値を持つシンボルを推定
             Eigen::VectorXd::Index col;
             obj.minCoeff(&col);
             rxData = col;
@@ -340,7 +351,7 @@ class Simulator {
         }
 
         // ビット誤り率を計算
-        return static_cast<double>(numberOfErrorBit) / (N_Tri * NUMBER_OF_BIT);
+        return (double)numberOfErrorBit / N_Tri / NUMBER_OF_BIT / (double)L;
     }
 
     // 理論値
@@ -478,14 +489,14 @@ class Simulator {
     }
 
     // QPSK_1次ダイバーシチ[ディジタルコミュニケーションp.898:式(14-3-7)]
-    double get_QPSKTheory(double EbN0dB) {
+    double get_4QAMTheory(double EbN0dB) {
         double gamma_b = pow(10.0, 0.1 * EbN0dB);
         double ber = (1 - sqrt(gamma_b / (1.0 + gamma_b))) / 2;
         return ber;
     }
 
     // QPSK_2次のダイバーシチ[ディジタルコミュニケーションp.898:式(14-4-15)]
-    double get_QPSKTheory_2diversity(double EbN0dB) {
+    double get_4QAMTheory_2diversity(double EbN0dB) {
         double EbN0 = 0.5 * pow(10.0, 0.1 * EbN0dB);
         double mu = sqrt(EbN0 / (1.0 + EbN0));
         double ber = pow((1.0 - mu) / 2.0, 2) * (2.0 + mu);

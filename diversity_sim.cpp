@@ -4,7 +4,7 @@
 
 // SNR
 static const double EbN0dBmin = 0.0;        // Eb/N0 の最小値 [dB]
-static const double EbN0dBmax = 40.0;       // Eb/N0 の最大値 [dB]
+static const double EbN0dBmax = 40.1;       // Eb/N0 の最大値 [dB]
 static const double EbN0dBstp = 5.0;        // Eb/N0 の間隔 [dB]
 double EbN0dB;
 
@@ -30,7 +30,7 @@ int main() {
 
     // ファイルの初期化
     int M = std::pow(sim.NUMBER_OF_BIT, 2);     // 多値数
-    filename = std::to_string(M) + "QAM_theory_" + std::to_string(L) + "diversity.csv";
+    filename = std::to_string(M) + "QAM_" + std::to_string(L) + "diversity_sim.csv";
     ofs.open(filename);
 
     // Eb/N0[dB]でループ
@@ -47,8 +47,9 @@ int main() {
         // ファイル出力
         ofs << EbN0dB << "," << ber << std::endl;
     }
-
     ofs.close();
+
+    //sim.checkSymbolPower();
 
     return 0;
 }

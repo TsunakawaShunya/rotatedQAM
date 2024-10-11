@@ -3,8 +3,8 @@
 
 // SNR
 static const double EbN0dBmin = 0.0;        // Eb/N0 の最小値 [dB]
-static const double EbN0dBmax = 40.0;        // Eb/N0 の最大値 [dB]
-static const double EbN0dBstp = 0.5;        // Eb/N0 の間隔 [dB]
+static const double EbN0dBmax = 40.1;        // Eb/N0 の最大値 [dB]
+static const double EbN0dBstp = 0.1;        // Eb/N0 の間隔 [dB]
 double EbN0dB;
 
 // ファイル
@@ -24,8 +24,8 @@ int main() {
 
     switch(sim.NUMBER_OF_BIT) {
         case 2:
-            filenameTheory_1 = "QPSK_theory_1Diversity_hyp.csv";
-            filenameTheory_2 = "QPSK_theory_2Diversity_hyp.csv";
+            filenameTheory_1 = "4QAM_1Diversity_hyp.csv";
+            filenameTheory_2 = "4QAM_2Diversity_hyp.csv";
             ofsTheory_1.open(filenameTheory_1);
             ofsTheory_2.open(filenameTheory_2);
 
@@ -45,8 +45,8 @@ int main() {
             ofsTheory_2.close();
         break;
         case 4:
-            filenameTheory_1 = "16QAM_theory_1Diversity_hyp.csv";
-            filenameTheory_2 = "16QAM_theory_2Diversity_hyp.csv";
+            filenameTheory_1 = "16QAM_1Diversity_hyp.csv";
+            filenameTheory_2 = "16QAM_2Diversity_hyp.csv";
             ofsTheory_1.open(filenameTheory_1);
             ofsTheory_2.open(filenameTheory_2);
 

@@ -66,185 +66,6 @@ class Simulator {
     }
 
     // シンボル設計
-    void setSymbol_non_gene() {
-        switch(NUMBER_OF_BIT) {
-            // 4QAM(QPSK)
-            case 2:
-                P = 1.0 / 2.0;
-
-                for(int i = 0; i < numberOfSymbols_; i++) {
-                    // 1ビット目
-                    if((grayNum_[i] & 1) == 0) {
-                        symbol_(i).real(sqrt(P));
-                    } else {
-                        symbol_(i).real(-sqrt(P));
-                    }
-
-                    // 2ビット目
-                    if(((grayNum_[i] >> 1) & 1) == 0) {
-                        symbol_(i).imag(sqrt(P));
-                    } else {
-                        symbol_(i).imag(-sqrt(P));
-                    }
-                }
-            break;
-
-            // 16QAM
-            case 4:
-                P = 1.0 / 10.0;
-
-                for(int i = 0; i < numberOfSymbols_; i++) {
-                    // 実部の設計(3, 4ビット目で決まる)
-                    switch((grayNum_[i] >> 2) & 0b11) {
-                        case 0b00: 
-                            symbol_(i).real(-3 * sqrt(P));
-                        break;
-                        case 0b01: 
-                            symbol_(i).real(-sqrt(P));
-                        break;
-                        case 0b11: 
-                            symbol_(i).real(sqrt(P));
-                        break;
-                        case 0b10: 
-                            symbol_(i).real(3 * sqrt(P));
-                        break;
-                    }
-                    // 虚部の設計(1, 2ビット目で決まる)
-                    switch(grayNum_[i] & 0b11) {
-                        case 0b00: 
-                            symbol_(i).imag(-3 * sqrt(P));
-                        break;
-                        case 0b01: 
-                            symbol_(i).imag(-sqrt(P));
-                        break;
-                        case 0b11: 
-                            symbol_(i).imag(sqrt(P));
-                        break;
-                        case 0b10: 
-                            symbol_(i).imag(3 * sqrt(P));
-                        break;
-                    }
-                }
-            break;
-            // 64QAM
-            case 6:
-                P = 1.0 / 42.0;
-
-                for(int i = 0; i < numberOfSymbols_; i++) {
-                    // 実部の設計(5, 6ビット目で決まる)
-                    switch((grayNum_[i] >> 4) & 0b1111) {
-                        case 0b0000: 
-                            symbol_(i).real(-7 * sqrt(P));
-                        break;
-                        case 0b0001: 
-                            symbol_(i).real(-5 * sqrt(P));
-                        break;
-                        case 0b0011: 
-                            symbol_(i).real(-3 * sqrt(P));
-                        break;
-                        case 0b0010: 
-                            symbol_(i).real(-1 * sqrt(P));
-                        break;
-                        case 0b0110: 
-                            symbol_(i).real(1 * sqrt(P));
-                        break;
-                        case 0b0111: 
-                            symbol_(i).real(3 * sqrt(P));
-                        break;
-                        case 0b0101: 
-                            symbol_(i).real(5 * sqrt(P));
-                        break;
-                        case 0b0100: 
-                            symbol_(i).real(7 * sqrt(P));
-                        break;
-                        case 0b1100: 
-                            symbol_(i).real(9 * sqrt(P));
-                        break;
-                        case 0b1101: 
-                            symbol_(i).real(11 * sqrt(P));
-                        break;
-                        case 0b1111: 
-                            symbol_(i).real(13 * sqrt(P));
-                        break;
-                        case 0b1110: 
-                            symbol_(i).real(15 * sqrt(P));
-                        break;
-                        case 0b1010: 
-                            symbol_(i).real(-15 * sqrt(P));
-                        break;
-                        case 0b1011: 
-                            symbol_(i).real(-13 * sqrt(P));
-                        break;
-                        case 0b1001: 
-                            symbol_(i).real(-11 * sqrt(P));
-                        break;
-                        case 0b1000: 
-                            symbol_(i).real(-9 * sqrt(P));
-                        break;
-                    }
-
-                    // 虚部の設計(3, 4ビット目で決まる)
-                    switch((grayNum_[i] >> 2) & 0b11) {
-                        case 0b00: 
-                            symbol_(i).imag(-7 * sqrt(P));
-                        break;
-                        case 0b01: 
-                            symbol_(i).imag(-5 * sqrt(P));
-                        break;
-                        case 0b11: 
-                            symbol_(i).imag(-3 * sqrt(P));
-                        break;
-                        case 0b10: 
-                            symbol_(i).imag(-1 * sqrt(P));
-                        break;
-                        case 0b110: 
-                            symbol_(i).imag(1 * sqrt(P));
-                        break;
-                        case 0b111: 
-                            symbol_(i).imag(3 * sqrt(P));
-                        break;
-                        case 0b101: 
-                            symbol_(i).imag(5 * sqrt(P));
-                        break;
-                        case 0b100: 
-                            symbol_(i).imag(7 * sqrt(P));
-                        break;
-                    }
-
-                    // 1, 2ビット目の設計
-                    switch(grayNum_[i] & 0b11) {
-                        case 0b00: 
-                            symbol_(i).imag(-7 * sqrt(P));
-                        break;
-                        case 0b01: 
-                            symbol_(i).imag(-5 * sqrt(P));
-                        break;
-                        case 0b11: 
-                            symbol_(i).imag(-3 * sqrt(P));
-                        break;
-                        case 0b10: 
-                            symbol_(i).imag(-1 * sqrt(P));
-                        break;
-                        case 0b110: 
-                            symbol_(i).imag(1 * sqrt(P));
-                        break;
-                        case 0b111: 
-                            symbol_(i).imag(3 * sqrt(P));
-                        break;
-                        case 0b101: 
-                            symbol_(i).imag(5 * sqrt(P));
-                        break;
-                        case 0b100: 
-                            symbol_(i).imag(7 * sqrt(P));
-                        break;
-                    }
-                }
-            break;
-        }
-        std::cout << symbol_ << std::endl;
-    }
-
-    // シンボル設計（一般化）
     void setSymbol() {
         int M = numberOfSymbols_;               // M = 2^NUMBER_OF_BIT (シンボル数)
         int sqrtM = sqrt(M);                    // 実部/虚部のレベル数 (例: 16QAMならsqrtM=4)
@@ -285,7 +106,7 @@ class Simulator {
 
     // 加法性雑音の標準偏差を設定
     void setNoiseSD(double EbN0dB) {
-        noiseSD_ = sqrt(pow(10.0, -0.1 * EbN0dB) / (double)NUMBER_OF_BIT);        // Eb/N0 [dB] から変換
+        noiseSD_ = sqrt(pow(10.0, -0.1 * EbN0dB) / (double)NUMBER_OF_BIT);
     }
 
     // 結果
@@ -304,94 +125,45 @@ class Simulator {
     double getBerSimulation_Ldiversity(int L) {
         int txData;                 // 送信データ
         int rxData;                 // 受信データ
-        std::complex<double> s;     // 送信シンボル
-        std::complex<double> r;     // 受信シンボル
         Eigen::VectorXcd x(L);      // 送信シンボルベクトル
         Eigen::VectorXcd y(L);      // 受信シンボルベクトル
-        Eigen::MatrixXcd h(L, L);   // 伝送路応答行列
+        Eigen::VectorXcd h(L);      // 伝送路応答行列
         Eigen::VectorXcd n(L);      // 雑音
         Eigen::VectorXd obj(numberOfSymbols_);  // 目的関数ベクトル
-        int numberOfErrorBit = 0;   // エラービット数
+        int berCnt = 0;                         // エラービット数
 
         for (int trial = 0; trial < N_Tri; trial++) {
-            // 初期化
-            h.setZero();
             // 送信データ生成
             txData = unitIntUniformRand_();
-            s = symbol_(txData);
             for (int l = 0; l < L; l++) {
-                x(l) = s / (double)L;
-                h(l, l) = unitCNormalRand_();               // 伝送路
-                n(l) = unitCNormalRand_() / (double)L;      // 雑音
+                x(l) = symbol_(txData);
+                h(l) = unitCNormalRand_();      // 伝送路
+                n(l) = unitCNormalRand_();      // 雑音
+
+                // 受信
+                y(l) = x(l) + noiseSD_ * sqrt(L) * n(l) / h(l);
             }
-
-            // 受信
-            y = x + noiseSD_ * h.inverse() * n;
-            /*
-            std::cout << "y = " << y << std::endl;
-            std::cout << "x = " << x << std::endl;
-            std::cout << "h = " << h << std::endl;
-            std::cout << "n = " << n << std::endl;
-            */
-
-            // 合成
-            r = y.sum();
-            // std::cout << "r = " << r << std::endl;
 
             // 最尤推定
             for (int i = 0; i < numberOfSymbols_; i++) {
-                obj(i) = std::norm(r - (double)L * symbol_(i));
+                obj(i) = 0.0;
+                for(int l = 0; l < L; l++) {
+                    obj(i) += std::norm(h(l)) * std::norm((y(l) - symbol_(i)));
+                }
             }
             Eigen::VectorXd::Index col;
             obj.minCoeff(&col);
             rxData = col;
 
             // ビットエラー数をカウント
-            numberOfErrorBit += hammingDistance(rxData, txData);
+            berCnt += hammingDistance(grayNum_[rxData], grayNum_[txData]);
         }
 
         // ビット誤り率を計算
-        return (double)numberOfErrorBit / N_Tri / NUMBER_OF_BIT / (double)L;
+        return (double)berCnt / (double)N_Tri / (double)NUMBER_OF_BIT;
     }
 
     // 理論値
-    // QPSK平均BERの上界
-    double getBerUpperBound(double theta) {
-        double berUpperBound = 0;
-        double per = 0;
-        Eigen::MatrixXd gamma;
-        double zata_0;
-        double zeta_1;
-
-        // γ_0, γ_1
-        gamma.resize(4, 2);     // γは誤りパターンの4通り存在する
-        gamma(0, 0) = pow(cos(theta), 2);        // -+|++など4個
-        gamma(0, 1) = pow(sin(theta), 2);
-        gamma(1, 0) = pow(cos(theta), 2);        // +-|++など4個
-        gamma(1, 1) = pow(sin(theta), 2);
-        gamma(2, 0) = (1 - sin(2 * theta));        // --|++など2個
-        gamma(2, 1) = (1 + sin(2 * theta));
-        gamma(3, 0) = (1 + sin(2 * theta));        // -+|+-など2個
-        gamma(3, 1) = (1 - sin(2 * theta));
-        gamma = 2 * P / pow(noiseSD_, 2) * gamma;
-
-        for(int i = 0; i < 4; i++) {
-            zata_0 = gamma(i, 0) / (gamma(i, 0) - gamma(i, 1));
-            zeta_1 = gamma(i, 1) / (gamma(i, 1) - gamma(i, 0));
-            per = ((zata_0 * (1 - sqrt(gamma(i, 0) / (2 + gamma(i, 0))))) + (zeta_1 * (1 - sqrt(gamma(i, 1) / (2 + gamma(i, 1)))))) / 2;
-
-            // 誤り方によって場合分け
-            if (i == 0 || i == 1) {
-                per = per * 4 / 2;      // 4個 × 重み(1/2)
-            } else {
-                per = per * 2;      // 2個 × 重み(1)
-            }
-            berUpperBound += per;
-        }
-
-        return berUpperBound / 4;
-    }
-
     // 誤りビット数ごとの平均BERの上界
     Eigen::VectorXd getBerUpperBoundVec(double theta_rad) {
         Eigen::VectorXd ber;
@@ -415,12 +187,7 @@ class Simulator {
         return ber / numberOfSymbols_;
     }
 
-    // 平均BERの上界の近似(QPSK)
-    double nearly_getQPSKBerUpperBound(double theta) {
-        double lambda = 1 / (pow(cos(theta), 2) * pow(sin(theta), 2)) + 1 / pow(cos(2 * theta), 2);
-        return 3 * pow(noiseSD_, 4) * lambda / 4;
-    }
-
+    // 平均BERの上界の近似
     Eigen::VectorXd get_nearlyBerUpperBoundVec(double theta) {
         Eigen::VectorXd lambda;
         int hamming;        // iとi_hatのハミング距離

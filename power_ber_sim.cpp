@@ -11,7 +11,7 @@
 
 // SNR
 static const double EbN0dBmin = 0.0;        // Eb/N0 の最小値 [dB]
-static const double EbN0dBmax = 40.0;       // Eb/N0 の最大値 [dB]
+static const double EbN0dBmax = 40.1;       // Eb/N0 の最大値 [dB]
 static const double EbN0dBstp = 5.0;        // Eb/N0 の間隔 [dB]
 double EbN0dB;
 
@@ -41,7 +41,7 @@ int main() {
     sim.setRotationSymbol(theta);           // 回転
 
     // ファイルの初期化
-    int M = std::pow(sim.NUMBER_OF_BIT, 2);     // 多値数
+    int M = std::pow(2, sim.NUMBER_OF_BIT);     // 多値数
     filename = "Rotated" + std::to_string(M) + "QAM_sim_" + std::to_string(theta_deg) + "deg.csv";
     ofs.open(filename);
 

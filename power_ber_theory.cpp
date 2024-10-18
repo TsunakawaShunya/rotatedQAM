@@ -11,7 +11,7 @@
 
 // SNR
 static const double EbN0dBmin = 0.0;   // Eb/N0 の最小値 [dB]
-static const double EbN0dBmax = 40.0;  // Eb/N0 の最大値 [dB]
+static const double EbN0dBmax = 40.1;  // Eb/N0 の最大値 [dB]
 static const double EbN0dBstp = 0.1;   // Eb/N0 の間隔 [dB]
 
 // 回転角

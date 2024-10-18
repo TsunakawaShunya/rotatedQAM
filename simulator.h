@@ -67,16 +67,27 @@ class Simulator {
 
     // シンボル設計
     void setSymbol() {
-        int M = numberOfSymbols_;               // M = 2^NUMBER_OF_BIT (シンボル数)
+        int M = numberOfSymbols_;               // シンボル数 (M = 2^NUMBER_OF_BIT)
         int sqrtM = sqrt(M);                    // 実部/虚部のレベル数 (例: 16QAMならsqrtM=4)
-        double P = 1.0 / (2.0 * (M - 1) / 3.0); // 平均送信電力の正規化
+        double P = 1.0 / (2.0 * (M - 1) / 3.0);
 
+        // シンボル設計
+        int i = 0;
+        for (int v1 = 0; v1 < sqrtM; v1++) {
+            for (int v2 = 0; v2 < sqrtM; v2++) {
+                symbol_(i).real((2 * v1 - (sqrtM - 1)) * sqrt(P));  // 実部
+                if (v1 % 2 == 0) {  // v1が偶数のときは通常の配置
+                    symbol_(i).imag((2 * v2 - (sqrtM - 1)) * sqrt(P));  // 虚部
+                } else {  // v1が奇数のとき、虚部の値を逆順にする
+                    symbol_(i).imag(((sqrtM - 1) - 2 * v2) * sqrt(P));
+                }
+                i++;
+            }
+        }
+
+        // シンボルの確認出力
         for (int i = 0; i < numberOfSymbols_; i++) {
-            int realBits = grayNum_[i] & ((1 << (NUMBER_OF_BIT / 2)) - 1);                          // ビット列の後半（実部）
-            int imagBits = (grayNum_[i] >> (NUMBER_OF_BIT / 2)) & ((1 << (NUMBER_OF_BIT / 2)) - 1); // ビット列の前半（虚部）
-
-            symbol_(i).real(-(2 * realBits - (sqrtM - 1)) * sqrt(P));
-            symbol_(i).imag(-(2 * imagBits - (sqrtM - 1)) * sqrt(P));
+            std::cout << i << ":" << symbol_(i) << std::endl;
         }
     }
 
@@ -121,7 +132,7 @@ class Simulator {
         return (double)berCnt / (double)N_Tri / (double)NUMBER_OF_BIT / 2.0;
     }
 
-    // L次ダイバーシチシミュレーションまだ間違えている
+    // L次ダイバーシチシミュレーション
     double getBerSimulation_Ldiversity(int L) {
         int txData;                 // 送信データ
         int rxData;                 // 受信データ
@@ -255,14 +266,14 @@ class Simulator {
         return x_rad_min * 180.0 / M_PI;
     }
 
-    // QPSK_1次ダイバーシチ[ディジタルコミュニケーションp.898:式(14-3-7)]
+    // 4QAM：1次ダイバーシチ[ディジタルコミュニケーションp.898:式(14-3-7)]
     double get_4QAMTheory(double EbN0dB) {
         double gamma_b = pow(10.0, 0.1 * EbN0dB);
         double ber = (1 - sqrt(gamma_b / (1.0 + gamma_b))) / 2;
         return ber;
     }
 
-    // QPSK_2次のダイバーシチ[ディジタルコミュニケーションp.898:式(14-4-15)]
+    // 4QAM：2次のダイバーシチ[ディジタルコミュニケーションp.898:式(14-4-15)]
     double get_4QAMTheory_2diversity(double EbN0dB) {
         double EbN0 = 0.5 * pow(10.0, 0.1 * EbN0dB);
         double mu = sqrt(EbN0 / (1.0 + EbN0));
@@ -270,17 +281,7 @@ class Simulator {
         return ber;
     }
 
-    // 16QAM_1次のダイバーシチ[ディジタルコミュニケーションp.917:式(14-4-47)]
-    // 16QAM理論値
-    double get_16QAMTheory(double EbN0dB) {
-        double EbN0 = pow(10.0, 0.1 * EbN0dB);
-
-        return 3.0 / 8.0 * (1.0 - 1.0 / sqrt(1.0 + 5.0 / 2.0 / EbN0))
-                + 1.0 / 4.0 * (1.0 - 1.0 / sqrt(1.0 + 5.0 * 2.0 / EbN0 / 9.0))
-                - 1.0 / 8.0 * (1.0 - 1.0 / sqrt(1.0 + 5.0 * 2.0 / EbN0 / 25.0));
-    }
-
-    // 4QAMのL次ダイバーシチ（積分）
+    // 4QAM：L次ダイバーシチ（積分）
     double get_4QAMTheory_Ldiversity_int(double EbN0dB, int L = 2) {
         double EbN0 = pow(10.0, 0.1 * EbN0dB) / (double)L;
         double gamma_b;                         // 瞬時EbN0
@@ -312,7 +313,7 @@ class Simulator {
         return ber;
     }
 
-    // 4QAMのL次ダイバーシチ（超幾何関数）
+    // 4QAM：L次ダイバーシチ（超幾何関数）
     double get_4QAMTheory_Ldiversity_hyp(double EbN0dB, int L = 2) {
         double EbN0 = pow(10.0, 0.1 * EbN0dB) / (double)L;
         double gamma_c = EbN0;                  // 伝送路当たりの平均EbN0
@@ -322,7 +323,17 @@ class Simulator {
                 * hypergeometric_2F1(0.5, L, L + 1, 1 / (1 + gamma_c));
     }
 
-    // 16QAMのL次ダイバーシチ（積分）
+    // 16QAM理論値
+    // 16QAM：1次のダイバーシチ
+    double get_16QAMTheory(double EbN0dB) {
+        double EbN0 = pow(10.0, 0.1 * EbN0dB);
+
+        return 3.0 / 8.0 * (1.0 - 1.0 / sqrt(1.0 + 5.0 / 2.0 / EbN0))
+                + 1.0 / 4.0 * (1.0 - 1.0 / sqrt(1.0 + 5.0 * 2.0 / EbN0 / 9.0))
+                - 1.0 / 8.0 * (1.0 - 1.0 / sqrt(1.0 + 5.0 * 2.0 / EbN0 / 25.0));
+    }
+
+    // 16QAM：L次ダイバーシチ（積分）
     double get_16QAMTheory_Ldiversity_int(double EbN0dB, int L = 2) {
         double EbN0 = pow(10.0, 0.1 * EbN0dB) / (double)L;
         double gamma_b;                         // 瞬時EbN0
@@ -356,7 +367,7 @@ class Simulator {
         return ber;
     }
 
-    // 16QAMのL次ダイバーシチ（超幾何関数）
+    // 16QAM：L次ダイバーシチ（超幾何関数）
     double get_16QAMTheory_Ldiversity_hyp(double EbN0dB, int L = 2) {
         double EbN0 = pow(10.0, 0.1 * EbN0dB) / (double)L;
         double gamma_c = EbN0;                  // 伝送路当たりの平均EbN0
@@ -369,6 +380,19 @@ class Simulator {
                 - (boost::math::tgamma(L + 0.5)) / (2 * sqrt(M_PI) * L * pow((1 / gamma_c + 50.0 / 5.0), L))
                 * hypergeometric_2F1(0.5, L, L + 1, (1 / gamma_c) / (1 / gamma_c + 50.0 / 5.0)));
     }
+
+    // 64QAM理論値
+    // 64QAM：1次ダイバーシチ
+    double get_64QAMTheory(double EbN0dB) {
+        double gamma_b = pow(10.0, 0.1 * EbN0dB);
+
+        return 7.0 / 24.0 * (1.0 - 1.0 / sqrt(1.0 + 7.0 / gamma_b))
+                + 1.0 / 4.0 * (1.0 - 1.0 / sqrt(1.0 + 7.0 / 9.0 / gamma_b))
+                - 1.0 / 8.0 * (1.0 - 1.0 / sqrt(1.0 + 7.0 / 25.0 / gamma_b))
+                + 1.0 / 24.0 * (1.0 - 1.0 / sqrt(1.0 + 7.0 / 81.0 / gamma_b))
+                - 1.0 / 24.0 * (1.0 - 1.0 / sqrt(1.0 + 7.0 / 169.0 / gamma_b));
+    }
+
 
     protected:
     int numberOfSymbols_;       // シンボル数

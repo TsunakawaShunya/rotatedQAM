@@ -84,11 +84,6 @@ class Simulator {
                 i++;
             }
         }
-
-        // シンボルの確認出力
-        for (int i = 0; i < numberOfSymbols_; i++) {
-            std::cout << i << ":" << symbol_(i) << std::endl;
-        }
     }
 
     // シンボルの平均電力チェック
@@ -391,6 +386,25 @@ class Simulator {
                 - 1.0 / 8.0 * (1.0 - 1.0 / sqrt(1.0 + 7.0 / 25.0 / gamma_b))
                 + 1.0 / 24.0 * (1.0 - 1.0 / sqrt(1.0 + 7.0 / 81.0 / gamma_b))
                 - 1.0 / 24.0 * (1.0 - 1.0 / sqrt(1.0 + 7.0 / 169.0 / gamma_b));
+    }
+
+    // 64QAM：L次ダイバーシチ（超幾何関数）
+    double get_64QAMTheory_Ldiversity_hyp(double EbN0dB, int L = 2) {
+        double EbN0 = pow(10.0, 0.1 * EbN0dB) / (double)L;
+        double gamma_c = EbN0;                  // 伝送路当たりの平均EbN0
+
+        // 以下に64QAMのL次ダイバーシチのBERを返す
+        return 1 / (12 * factorial(L - 1) * pow(gamma_c, L)) 
+                * ((7 * boost::math::tgamma(L + 0.5)) / (2 * sqrt(M_PI) * L * pow((1 / gamma_c + 1.0 / 7.0), L))
+                * hypergeometric_2F1(0.5, L, L + 1, (1 / gamma_c) / (1 / gamma_c + 1.0 / 7.0))
+                + (6 * boost::math::tgamma(L + 0.5)) / (2 * sqrt(M_PI) * L * pow((1 / gamma_c + 9.0 / 7.0), L))
+                * hypergeometric_2F1(0.5, L, L + 1, (1 / gamma_c) / (1 / gamma_c + 9.0 / 7.0))
+                - (boost::math::tgamma(L + 0.5)) / (2 * sqrt(M_PI) * L * pow((1 / gamma_c + 25.0 / 7.0), L))
+                * hypergeometric_2F1(0.5, L, L + 1, (1 / gamma_c) / (1 / gamma_c + 25.0 / 7.0))
+                + (6 * boost::math::tgamma(L + 0.5)) / (2 * sqrt(M_PI) * L * pow((1 / gamma_c + 81.0 / 7.0), L))
+                * hypergeometric_2F1(0.5, L, L + 1, (1 / gamma_c) / (1 / gamma_c + 81.0 / 7.0))
+                - (boost::math::tgamma(L + 0.5)) / (2 * sqrt(M_PI) * L * pow((1 / gamma_c + 169.0 / 7.0), L))
+                * hypergeometric_2F1(0.5, L, L + 1, (1 / gamma_c) / (1 / gamma_c + 169.0 / 7.0)));
     }
 
 

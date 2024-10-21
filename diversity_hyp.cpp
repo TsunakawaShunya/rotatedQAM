@@ -64,6 +64,26 @@ int main() {
             ofsTheory_1.close();
             ofsTheory_2.close();
         break;
+        case 6:
+            filenameTheory_1 = "64QAM_1Diversity_hyp.csv";
+            filenameTheory_2 = "64QAM_2Diversity_hyp.csv";
+            ofsTheory_1.open(filenameTheory_1);
+            ofsTheory_2.open(filenameTheory_2);
+
+            for(double EbN0dB = EbN0dBmin; EbN0dB <= EbN0dBmax; EbN0dB += EbN0dBstp) {
+                // 標準出力
+                berTheory_1 = sim.get_64QAMTheory_Ldiversity_hyp(EbN0dB, 1);
+                std::cout << "Theory hyp(1-Diversity) : " << EbN0dB << "," << berTheory_1 << std::endl;
+                berTheory_2 = sim.get_64QAMTheory_Ldiversity_hyp(EbN0dB, 2);
+                std::cout << "Theory hyp(2-Diversity) : " << EbN0dB << "," << berTheory_2 << std::endl;
+
+                // ファイル出力
+                ofsTheory_1 << EbN0dB << "," << berTheory_1 << std::endl;
+                ofsTheory_2 << EbN0dB << "," << berTheory_2 << std::endl;
+            }
+            ofsTheory_1.close();
+            ofsTheory_2.close();
+        break;
     }
     return 0;
 }

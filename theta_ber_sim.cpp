@@ -101,5 +101,30 @@ int main() {
     ofs << theta_deg << "," << ber << std::endl;
     ofs.close();
     */
+
+       /*        
+    // 最適な回転角の結果を追加（16QAM）
+    // 21.0148
+    theta_deg = 21.0148;
+    //std::cout << theta_opt * 180 / M_PI << std::endl;
+    sim.setRotationSymbol(theta_opt);
+    ber = sim.getBerSimulation();
+    std::cout << theta_deg << "," << ber << std::endl;
+    ofs << theta_deg << "," << ber << std::endl;
+
+    theta_deg = 31.7;
+    sim.setRotationSymbol(theta_deg * M_PI / 180);
+    ber = sim.getBerSimulation();
+    std::cout << theta_deg << "," << ber << std::endl;
+    ofs << theta_deg << "," << ber << std::endl;
+
+    theta_deg = 35.8;
+    sim.setRotationSymbol(theta_deg * M_PI / 180);
+    ber = sim.getBerSimulation();
+    std::cout << theta_deg << "," << ber << std::endl;
+    ofs << theta_deg << "," << ber << std::endl;
+    ofs.close();
+    */
+
     return 0;
 }

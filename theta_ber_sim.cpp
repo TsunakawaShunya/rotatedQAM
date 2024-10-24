@@ -32,7 +32,7 @@ int main() {
     sim.setNoiseSD(EbN0dB);
 
     // ファイルの初期化
-    int M = std::pow(sim.NUMBER_OF_BIT, 2);     // 多値数
+    int M = std::pow(2, sim.NUMBER_OF_BIT);     // 多値数
     filename = "Rotated" + std::to_string(M) + "QAM_sim_" + std::to_string((int)EbN0dB) + "dB.csv";
     ofs.open(filename);
 

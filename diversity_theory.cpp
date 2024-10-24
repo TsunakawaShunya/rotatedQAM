@@ -72,6 +72,20 @@ int main() {
             }
             ofsTheory_1.close();
         break;
+        case 8:
+            filenameTheory_1 = "256QAM_1Diversity_theory.csv";
+            ofsTheory_1.open(filenameTheory_1);
+
+            for(double EbN0dB = EbN0dBmin; EbN0dB <= EbN0dBmax; EbN0dB += EbN0dBstp) {
+                // 標準出力
+                berTheory_1 = sim.get_256QAMTheory(EbN0dB);
+                std::cout << "Theory(1-Diversity) : " << EbN0dB << "," << berTheory_1 << std::endl;
+
+                // ファイル出力
+                ofsTheory_1 << EbN0dB << "," << berTheory_1 << std::endl;
+            }
+            ofsTheory_1.close();
+        break;
     }
     return 0;
 }

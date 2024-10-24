@@ -407,6 +407,61 @@ class Simulator {
                 * hypergeometric_2F1(0.5, L, L + 1, (1 / gamma_c) / (1 / gamma_c + 169.0 / 7.0)));
     }
 
+    // 256QAM理論値
+    // 256QAM：1次ダイバーシチ
+    double get_256QAMTheory(double EbN0dB) {
+        double gamma_b = pow(10.0, 0.1 * EbN0dB);
+
+        return 15.0 / 64.0 * (1.0 - 1.0 / sqrt(1.0 + 85.0 / 4.0 / gamma_b))
+                + 7.0 / 32.0 * (1.0 - 1.0 / sqrt(1.0 + 85.0 / 4.0 / 9.0 / gamma_b))
+                - 1.0 / 64.0 * (1.0 - 1.0 / sqrt(1.0 + 85.0 / 4.0 / 25.0 / gamma_b))
+                + 5.0 / 64.0 * (1.0 - 1.0 / sqrt(1.0 + 85.0 / 4.0 / 81.0 / gamma_b))
+                + 3.0 / 64.0 * (1.0 - 1.0 / sqrt(1.0 + 85.0 / 4.0 / 121.0 / gamma_b))
+                - 1.0 / 16.0 * (1.0 - 1.0 / sqrt(1.0 + 85.0 / 4.0 / 169.0 / gamma_b))
+                - 1.0 / 16.0 * (1.0 - 1.0 / sqrt(1.0 + 85.0 / 4.0 / 225.0 / gamma_b))
+                + 1.0 / 16.0 * (1.0 - 1.0 / sqrt(1.0 + 85.0 / 4.0 / 289.0 / gamma_b))
+                + 1.0 / 16.0 * (1.0 - 1.0 / sqrt(1.0 + 85.0 / 4.0 / 361.0 / gamma_b))
+                - 1.0 / 32.0 * (1.0 - 1.0 / sqrt(1.0 + 85.0 / 4.0 / 441.0 / gamma_b))
+                - 1.0 / 32.0 * (1.0 - 1.0 / sqrt(1.0 + 85.0 / 4.0 / 529.0 / gamma_b))
+                + 1.0 / 64.0 * (1.0 - 1.0 / sqrt(1.0 + 85.0 / 4.0 / 625.0 / gamma_b))
+                - 1.0 / 64.0 * (1.0 - 1.0 / sqrt(1.0 + 85.0 / 4.0 / 841.0 / gamma_b));
+    }
+
+    // 256QAM：L次ダイバーシチ（超幾何関数）
+    double get_256QAMTheory_Ldiversity_hyp(double EbN0dB, int L = 2) {
+        double EbN0 = pow(10.0, 0.1 * EbN0dB) / (double)L;
+        double gamma_c = EbN0;                  // 伝送路当たりの平均EbN0
+
+        // 以下に256QAMのL次ダイバーシチのBERを返す
+        return 1 / (factorial(L - 1) * pow(gamma_c, L)) 
+                * ((15.0 / 32.0 * boost::math::tgamma(L + 0.5)) / (2 * sqrt(M_PI) * L * pow((1 / gamma_c + 4.0 / 85.0), L))
+                * hypergeometric_2F1(0.5, L, L + 1, (1 / gamma_c) / (1 / gamma_c + 4.0 / 85.0))
+                + (7.0 / 16.0 * boost::math::tgamma(L + 0.5)) / (2 * sqrt(M_PI) * L * pow((1 / gamma_c + 9.0 * 4.0 / 85.0), L))
+                * hypergeometric_2F1(0.5, L, L + 1, (1 / gamma_c) / (1 / gamma_c + 9.0 * 4.0 / 85.0))
+                - (1.0 / 32.0 * boost::math::tgamma(L + 0.5)) / (2 * sqrt(M_PI) * L * pow((1 / gamma_c + 25.0 * 4.0 / 85.0), L))
+                * hypergeometric_2F1(0.5, L, L + 1, (1 / gamma_c) / (1 / gamma_c + 25.0 * 4.0 / 85.0))
+                + (5.0 / 32.0 * boost::math::tgamma(L + 0.5)) / (2 * sqrt(M_PI) * L * pow((1 / gamma_c + 81.0 * 4.0 / 85.0), L))
+                * hypergeometric_2F1(0.5, L, L + 1, (1 / gamma_c) / (1 / gamma_c + 81.0 * 4.0 / 85.0))
+                + (3.0 / 32.0 * boost::math::tgamma(L + 0.5)) / (2 * sqrt(M_PI) * L * pow((1 / gamma_c + 121.0 * 4.0 / 85.0), L))
+                * hypergeometric_2F1(0.5, L, L + 1, (1 / gamma_c) / (1 / gamma_c + 121.0 * 4.0 / 85.0))
+                - (1.0 / 8.0 * boost::math::tgamma(L + 0.5)) / (2 * sqrt(M_PI) * L * pow((1 / gamma_c + 169.0 * 4.0 / 85.0), L))
+                * hypergeometric_2F1(0.5, L, L + 1, (1 / gamma_c) / (1 / gamma_c + 169.0 * 4.0 / 85.0))
+                - (1.0 / 8.0 * boost::math::tgamma(L + 0.5)) / (2 * sqrt(M_PI) * L * pow((1 / gamma_c + 225.0 * 4.0 / 85.0), L))
+                * hypergeometric_2F1(0.5, L, L + 1, (1 / gamma_c) / (1 / gamma_c + 225.0 * 4.0 / 85.0))
+                + (1.0 / 8.0 * boost::math::tgamma(L + 0.5)) / (2 * sqrt(M_PI) * L * pow((1 / gamma_c + 289.0 * 4.0 / 85.0), L))
+                * hypergeometric_2F1(0.5, L, L + 1, (1 / gamma_c) / (1 / gamma_c + 289.0 * 4.0 / 85.0))
+                + (1.0 / 8.0 * boost::math::tgamma(L + 0.5)) / (2 * sqrt(M_PI) * L * pow((1 / gamma_c + 361.0 * 4.0 / 85.0), L))
+                * hypergeometric_2F1(0.5, L, L + 1, (1 / gamma_c) / (1 / gamma_c + 361.0 * 4.0 / 85.0))
+                - (1.0 / 16.0 * boost::math::tgamma(L + 0.5)) / (2 * sqrt(M_PI) * L * pow((1 / gamma_c + 441.0 * 4.0 / 85.0), L))
+                * hypergeometric_2F1(0.5, L, L + 1, (1 / gamma_c) / (1 / gamma_c + 441.0 * 4.0 / 85.0))
+                - (1.0 / 16.0 * boost::math::tgamma(L + 0.5)) / (2 * sqrt(M_PI) * L * pow((1 / gamma_c + 529.0 * 4.0 / 85.0), L))
+                * hypergeometric_2F1(0.5, L, L + 1, (1 / gamma_c) / (1 / gamma_c + 529.0 * 4.0 / 85.0))
+                + (1.0 / 32.0 * boost::math::tgamma(L + 0.5)) / (2 * sqrt(M_PI) * L * pow((1 / gamma_c + 625.0 * 4.0 / 85.0), L))
+                * hypergeometric_2F1(0.5, L, L + 1, (1 / gamma_c) / (1 / gamma_c + 625.0 * 4.0 / 85.0))
+                - (1.0 / 32.0 * boost::math::tgamma(L + 0.5)) / (2 * sqrt(M_PI) * L * pow((1 / gamma_c + 841.0 * 4.0 / 85.0), L))
+                * hypergeometric_2F1(0.5, L, L + 1, (1 / gamma_c) / (1 / gamma_c + 841.0 * 4.0 / 85.0)));
+    }
+
 
     protected:
     int numberOfSymbols_;       // シンボル数

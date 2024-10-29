@@ -3,8 +3,8 @@
     最適な回転角
     QPSK: 27.3678°
     16QAM: 21.0148°
-    64QAM: 20.9291°
-    256QAM: 21.0098°
+    64QAM: 20.7135°
+    256QAM: 20.6784°
 */
 #include "simulator.h"
 #include <vector>

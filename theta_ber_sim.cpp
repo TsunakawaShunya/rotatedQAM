@@ -33,7 +33,7 @@ int main() {
 
     // ファイルの初期化
     int M = std::pow(2, sim.NUMBER_OF_BIT);     // 多値数
-    filename = "Rotated" + std::to_string(M) + "QAM_sim_" + std::to_string((int)EbN0dB) + "dB.csv";
+    filename = "Rotated" + std::to_string(M) + "QAM_sim_" + std::to_string((int)EbN0dB) + "dB_sub.csv";
     ofs.open(filename);
 
     for(double theta = theta_min; theta <= theta_max; theta += theta_stp) {

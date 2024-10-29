@@ -86,6 +86,124 @@ class Simulator {
         }
     }
 
+    void setSymbol_notGene() {
+        switch(NUMBER_OF_BIT) {
+            // 4QAM(QPSK)
+            case 2:
+                P = 1.0 / 2.0;
+                for(int i = 0; i < numberOfSymbols_; i++) {
+                    // 1ビット目
+                    if((grayNum_[i] & 1) == 0) {
+                        symbol_(i).real(sqrt(P));
+                    } else {
+                        symbol_(i).real(-sqrt(P));
+                    }
+                    // 2ビット目
+                    if(((grayNum_[i] >> 1) & 1) == 0) {
+                        symbol_(i).imag(sqrt(P));
+                    } else {
+                        symbol_(i).imag(-sqrt(P));
+                    }
+                }
+                break;
+
+            // 16QAM
+            case 4:
+                P = 1.0 / 10.0;
+                for(int i = 0; i < numberOfSymbols_; i++) {
+                    // 実部の設計(3, 4ビット目で決まる)
+                    switch((grayNum_[i] >> 2) & 0b11) {
+                        case 0b00: symbol_(i).real(-3 * sqrt(P)); break;
+                        case 0b01: symbol_(i).real(-sqrt(P)); break;
+                        case 0b11: symbol_(i).real(sqrt(P)); break;
+                        case 0b10: symbol_(i).real(3 * sqrt(P)); break;
+                    }
+                    // 虚部の設計(1, 2ビット目で決まる)
+                    switch(grayNum_[i] & 0b11) {
+                        case 0b00: symbol_(i).imag(-3 * sqrt(P)); break;
+                        case 0b01: symbol_(i).imag(-sqrt(P)); break;
+                        case 0b11: symbol_(i).imag(sqrt(P)); break;
+                        case 0b10: symbol_(i).imag(3 * sqrt(P)); break;
+                    }
+                }
+                break;
+
+            // 64QAM
+            case 6:
+                P = 1.0 / 42.0;
+                for(int i = 0; i < numberOfSymbols_; i++) {
+                    // 実部の設計(5, 6ビット目で決まる)
+                    switch((grayNum_[i] >> 4) & 0b11) {
+                        case 0b00: symbol_(i).real(-7 * sqrt(P)); break;
+                        case 0b01: symbol_(i).real(-5 * sqrt(P)); break;
+                        case 0b11: symbol_(i).real(-3 * sqrt(P)); break;
+                        case 0b10: symbol_(i).real(-sqrt(P)); break;
+                        case 0b100: symbol_(i).real(sqrt(P)); break;
+                        case 0b101: symbol_(i).real(3 * sqrt(P)); break;
+                        case 0b111: symbol_(i).real(5 * sqrt(P)); break;
+                        case 0b110: symbol_(i).real(7 * sqrt(P)); break;
+                    }
+                    // 虚部の設計(1, 2, 3ビット目で決まる)
+                    switch(grayNum_[i] & 0b11) {
+                        case 0b00: symbol_(i).imag(-7 * sqrt(P)); break;
+                        case 0b01: symbol_(i).imag(-5 * sqrt(P)); break;
+                        case 0b11: symbol_(i).imag(-3 * sqrt(P)); break;
+                        case 0b10: symbol_(i).imag(-sqrt(P)); break;
+                        case 0b100: symbol_(i).imag(sqrt(P)); break;
+                        case 0b101: symbol_(i).imag(3 * sqrt(P)); break;
+                        case 0b111: symbol_(i).imag(5 * sqrt(P)); break;
+                        case 0b110: symbol_(i).imag(7 * sqrt(P)); break;
+                    }
+                }
+                break;
+
+            // 256QAM
+            case 8:
+                P = 1.0 / 170.0;
+                for(int i = 0; i < numberOfSymbols_; i++) {
+                    // 実部の設計(7, 8ビット目で決まる)
+                    switch((grayNum_[i] >> 6) & 0b11) {
+                        case 0b00: symbol_(i).real(-15 * sqrt(P)); break;
+                        case 0b01: symbol_(i).real(-13 * sqrt(P)); break;
+                        case 0b11: symbol_(i).real(-11 * sqrt(P)); break;
+                        case 0b10: symbol_(i).real(-9 * sqrt(P)); break;
+                        case 0b100: symbol_(i).real(-7 * sqrt(P)); break;
+                        case 0b101: symbol_(i).real(-5 * sqrt(P)); break;
+                        case 0b111: symbol_(i).real(-3 * sqrt(P)); break;
+                        case 0b110: symbol_(i).real(-sqrt(P)); break;
+                        case 0b1000: symbol_(i).real(sqrt(P)); break;
+                        case 0b1001: symbol_(i).real(3 * sqrt(P)); break;
+                        case 0b1011: symbol_(i).real(5 * sqrt(P)); break;
+                        case 0b1010: symbol_(i).real(7 * sqrt(P)); break;
+                        case 0b1100: symbol_(i).real(9 * sqrt(P)); break;
+                        case 0b1101: symbol_(i).real(11 * sqrt(P)); break;
+                        case 0b1111: symbol_(i).real(13 * sqrt(P)); break;
+                        case 0b1110: symbol_(i).real(15 * sqrt(P)); break;
+                    }
+                    // 虚部の設計(1, 2, 3ビット目で決まる)
+                    switch(grayNum_[i] & 0b11) {
+                        case 0b00: symbol_(i).imag(-15 * sqrt(P)); break;
+                        case 0b01: symbol_(i).imag(-13 * sqrt(P)); break;
+                        case 0b11: symbol_(i).imag(-11 * sqrt(P)); break;
+                        case 0b10: symbol_(i).imag(-9 * sqrt(P)); break;
+                        case 0b100: symbol_(i).imag(-7 * sqrt(P)); break;
+                        case 0b101: symbol_(i).imag(-5 * sqrt(P)); break;
+                        case 0b111: symbol_(i).imag(-3 * sqrt(P)); break;
+                        case 0b110: symbol_(i).imag(-sqrt(P)); break;
+                        case 0b1000: symbol_(i).imag(sqrt(P)); break;
+                        case 0b1001: symbol_(i).imag(3 * sqrt(P)); break;
+                        case 0b1011: symbol_(i).imag(5 * sqrt(P)); break;
+                        case 0b1010: symbol_(i).imag(7 * sqrt(P)); break;
+                        case 0b1100: symbol_(i).imag(9 * sqrt(P)); break;
+                        case 0b1101: symbol_(i).imag(11 * sqrt(P)); break;
+                        case 0b1111: symbol_(i).imag(13 * sqrt(P)); break;
+                        case 0b1110: symbol_(i).imag(15 * sqrt(P)); break;
+                    }
+                }
+                break;
+        }
+    }
+
     // シンボルの平均電力チェック
     void checkSymbolPower() {
         double avgPower = 0.0;

@@ -1,3 +1,10 @@
+/*  
+    最適な回転角
+    QPSK: 27.3678°
+    16QAM: 21.0148°
+    64QAM: 20.7135°
+    256QAM: 20.6784°
+*/
 // 回転角に対するBER
 #include "simulator.h"
 #include <vector>
@@ -31,10 +38,10 @@ int main() {
     sim.setSymbol();        // 従来QAMシンボル設計
     sim.setNoiseSD(EbN0dB);
 
-    // 最適な回転角の結果を追加（64QAM）
-    // 20.9291
-    theta_deg = 20.9291;
-    sim.setRotationSymbol(theta_deg * 180 / M_PI);
+    // 最適な回転角の結果を追加（256QAM）
+    // 20.6784
+    theta_deg = 20.6784;
+    sim.setRotationSymbol(theta_deg * M_PI / 180.0);
     ber = sim.getBerSimulation();
     std::cout << theta_deg << "," << ber << std::endl;
 

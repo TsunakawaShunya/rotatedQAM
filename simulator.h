@@ -386,12 +386,23 @@ class Simulator {
         return ber;
     }
 
-    // 4QAM：2次のダイバーシチ[ディジタルコミュニケーションp.898:式(14-4-15)]
+    // 4QAM：2次のダイバーシチ[ディジタルコミュニケーションp.906:式(14-4-15)]
     double get_4QAMTheory_2diversity(double EbN0dB) {
         double EbN0 = 0.5 * pow(10.0, 0.1 * EbN0dB);
         double mu = sqrt(EbN0 / (1.0 + EbN0));
         double ber = pow((1.0 - mu) / 2.0, 2) * (2.0 + mu);
         return ber;
+    }
+
+    // 4QAM：L次のダイバーシチ[ディジタルコミュニケーションp.906:式(14-4-15)]
+    double get_4QAMTheory_Ldiversity(double EbN0dB, int L) {
+        double gamma_c = pow(10.0, 0.1 * EbN0dB) / (double)L;
+        double mu = sqrt(gamma_c / (1.0 + gamma_c));
+        double ber = 0;
+        for(int l = 0; l < L; l++) {
+            ber += combination(L - 1 + l, l) * pow((1.0 + mu) / 2.0, l);
+        }
+        return ber * pow((1.0 - mu) / 2.0, L);
     }
 
     // 4QAM：L次ダイバーシチ（積分）
@@ -747,10 +758,10 @@ class Simulator {
         return hammingDistance(rxData_(0), txData_(0)) + hammingDistance(rxData_(1), txData_(1));
     }
 
-    // コンビネーションを計算する関数
+    // コンビネーションを計算する関数(nCk)
     double combination(int n, int k) {
         if (k > n) return 0;
-        return std::tgamma(n + 1) / (std::tgamma(k + 1) * std::tgamma(n - k + 1));
+        return (double)(std::tgamma(n + 1) / (std::tgamma(k + 1) * std::tgamma(n - k + 1)));
     }
 
     // 階乗

@@ -86,6 +86,7 @@ class Simulator {
         }
     }
 
+    // 一般化する前のシンボル設計メソッド
     void setSymbol_notGene() {
         switch(NUMBER_OF_BIT) {
             // 4QAM(QPSK)

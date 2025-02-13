@@ -6,10 +6,10 @@
 double EbN0dB;
 
 // 回転角
-static const double theta_min = 0.0 * M_PI / 180;       // 回転角の最小値 [rad]
-static const double theta_max = 45.0 * M_PI / 180;      // 回転角の最大値 [rad]
-static const double theta_stp = 0.5 * M_PI / 180;       // 回転角の間隔 [rad]
-double theta_deg = 0.0;                                 // csvファイルの第1カラム(角度 [°])
+static const double theta_min = 0.01 * M_PI / 180;       // 回転角の最小値 [rad]
+static const double theta_max = 44.9 * M_PI / 180;      // 回転角の最大値 [rad]
+static const double theta_stp = 0.01 * M_PI / 180;       // 回転角の間隔 [rad]
+double theta_deg = 0.01;                                 // csvファイルの第1カラム(角度 [°])
 
 // BER
 Eigen::VectorXd berUpperBoundVec;                       // BER上界
@@ -43,21 +43,21 @@ void initializeFiles(Simulator& sim, std::ofstream& ofsUpperBoundSum,
 void processTheta(Simulator& sim, std::ofstream& ofsUpperBoundSum, std::ofstream& ofsNearlyUpperBoundSum,
                   std::vector<std::ofstream>& ofsUpperBound, std::vector<std::ofstream>& ofsNearlyUpperBound) {
 
-    for(double theta = theta_min; theta <= theta_max; theta += theta_stp) {
+    for(double theta = theta_min; theta < theta_max; theta += theta_stp) {
         berUpperBoundVec = sim.getBerUpperBoundVec(theta);
         berNearlyUpperBoundVec = sim.get_nearlyBerUpperBoundVec(theta);
 
         // 標準出力
-        std::cout << "--------------------------------------------" << std::endl;
-        for(int i = 0; i < sim.NUMBER_OF_BIT; i++) {
-            std::cout << "upperbound(" << i << ") : " << theta_deg << "," << berUpperBoundVec(i) << std::endl;
-        }
-        std::cout << "upperbound : " << theta_deg << "," << berUpperBoundVec.sum() << std::endl;
+        // std::cout << "--------------------------------------------" << std::endl;
+        // for(int i = 0; i < sim.NUMBER_OF_BIT; i++) {
+        //     std::cout << "upperbound(" << i << ") : " << theta_deg << "," << berUpperBoundVec(i) << std::endl;
+        // }
+        // std::cout << "upperbound : " << theta_deg << "," << berUpperBoundVec.sum() << std::endl;
 
-        for(int i = 0; i < sim.NUMBER_OF_BIT; i++) {
-            std::cout << "nearly_upperbound(" << i << ") : " << theta_deg << "," << berNearlyUpperBoundVec(i) << std::endl;
-        }
-        std::cout << "nearly_upperbound : " << theta_deg << "," << berNearlyUpperBoundVec.sum() << std::endl;
+        // for(int i = 0; i < sim.NUMBER_OF_BIT; i++) {
+        //     std::cout << "nearly_upperbound(" << i << ") : " << theta_deg << "," << berNearlyUpperBoundVec(i) << std::endl;
+        // }
+        // std::cout << "nearly_upperbound : " << theta_deg << "," << berNearlyUpperBoundVec.sum() << std::endl;
 
         // ファイル出力
         for (int i = 0; i < sim.NUMBER_OF_BIT; i++) {
@@ -70,7 +70,7 @@ void processTheta(Simulator& sim, std::ofstream& ofsUpperBoundSum, std::ofstream
         }
         ofsNearlyUpperBoundSum << theta_deg << "," << berNearlyUpperBoundVec.sum() << std::endl;
 
-        theta_deg += 0.5;     // csvファイルの第1カラムをインクリメント
+        theta_deg += 0.01;     // csvファイルの第1カラムをインクリメント
     }
 }
 

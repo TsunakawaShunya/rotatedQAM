@@ -32,7 +32,7 @@ class Simulator {
     Simulator() {
         // 次元を設定
         std::cout << "--------------------------------------------------------------------" << std::endl;
-        std::cout << "Number of Bit? (QPSK:2, 16QAM:4, 64QAM:6, 256QAM:8, 1024QAM:10)" << std::endl;
+        std::cout << "Number of Bit? (QPSK:2, 16QAM:4, 64QAM:6, 256QAM:8)" << std::endl;
         std::cout << "--------------------------------------------------------------------" << std::endl;
         std::cin >> NUMBER_OF_BIT;
 
